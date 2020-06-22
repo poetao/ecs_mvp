@@ -1,0 +1,12 @@
+{
+    "name": "MVP.Framework",
+    "references": [
+        "UnityEngine",
+        "UniRx",
+        "AsyncAwaitUtil"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
