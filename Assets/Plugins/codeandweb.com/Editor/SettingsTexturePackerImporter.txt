@@ -1,0 +1,9 @@
+version: 2
+importPivots: 1
+tpsheetFileNames:
+- Assets/Plugins/codeandweb.com/Example/SpriteSheet/sprites.tpsheet
+textureFileNames:
+- Assets/Plugins/codeandweb.com/Example/SpriteSheet/sprites.png
+normalmapFileNames:
+- Assets/Plugins/codeandweb.com/Example/SpriteSheet/sprites_n.png
+enableDebugOutput: 0
