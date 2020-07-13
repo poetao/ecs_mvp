@@ -28,6 +28,7 @@ namespace Features
             var dictionary = new Dictionary<string, Any>() {
                 {"Account", new Any(data) },
                 {"User", new Any("") },
+                {"Stage", new Any("") },
                 {"Game", new Any("") },
             };
             OnLogin(dictionary);

@@ -22,13 +22,10 @@ namespace Presenters
 			ShowStage();
 	    }
 
-		public void DoBack()
-		{
-			scene.Run("Home");
-		}
-
 		public async void ShowStage()
 		{
+			await window.Wait($"Stages/Level{level}");
+			scene.Run("Home");
 		}
     }
 }
