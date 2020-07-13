@@ -1,0 +1,13 @@
+{
+  "name": "Patch",
+  "references": [
+    "UnityEngine",
+    "UniRx",
+    "AsyncAwaitUtil",
+    "MVP.Framework"
+  ],
+  "optionalUnityReferences": [],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false
+}
