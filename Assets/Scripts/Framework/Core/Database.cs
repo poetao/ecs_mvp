@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using System.IO;
 using System;
-using UniRx;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Collections.Generic;
+using UnityEngine;
+using UniRx;
 
 namespace MVP.Framework.Core
 {
@@ -32,7 +30,7 @@ namespace MVP.Framework.Core
 
         public async Task LoadTablesAsync()
         {
-            var jsonData = Resources.Load("Database/config") as TextAsset;
+            var jsonData = UnityEngine.Resources.Load("Database/config") as TextAsset;
             TableNames = await Json.FromString<string[]>(jsonData.text);
         }
 
@@ -45,7 +43,7 @@ namespace MVP.Framework.Core
         {
             if (tables.ContainsKey(name)) return (T)tables[name];
 
-            var jsonData = Resources.Load("Database/"+name) as TextAsset;
+            var jsonData = UnityEngine.Resources.Load("Database/"+name) as TextAsset;
             var table = await Json.FromString<T>(jsonData.text);
             tables.Add(name, table);
             return table;

@@ -50,7 +50,7 @@ namespace MVP.Framework
         public async Task<AsyncOperation> Load(string name, LoadingOption option)
         {
             option.allowSceneActivation = false;
-            return await Resource.instance.LoadScene(name, option);
+            return await Resource.instance.LoadSceneAsync(name, option);
         }
 
         private async Task<Presenter> Start(SceneData data)
