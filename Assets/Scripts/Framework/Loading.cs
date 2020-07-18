@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEngine;
 using UniRx;
 using MVP.Framework.Core;
 using MVP.Framework.Loadings;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 
 namespace MVP.Framework
 {
@@ -20,8 +18,10 @@ namespace MVP.Framework
 
     public class ProgressInfo
     {
-        public float current;
-        public float total;
+        public float current = 0f;
+        public float total   = 1.0f;
+        public float min     = 0f;
+        public float max     = 1.0f;
     }
 
     public delegate void ProgressDelegate(ProgressInfo progress);

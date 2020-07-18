@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,16 +9,16 @@ namespace MVP.Framework.Windows
 {
     public struct ContainerInfo
     {
-        public static string path              = "Framework/Window/Container";
-        public static System.Type component    = typeof(Container);
-        public static GameObject prefab        = null;
+        public static string path                = "Framework/Window/Container";
+        public static Type component             = typeof(Container);
+        public static Resources.AssetRef prefab  = null;
     }
     
     public class Factory
     {
         public static async Task<Factory> Create()
         {
-            ContainerInfo.prefab = await Resource.instance.LoadAsync<GameObject>(ContainerInfo.path);
+            ContainerInfo.prefab = await Resource.instance.LoadAsync(ContainerInfo.path);
             return new Factory();            
         }
 
@@ -25,13 +26,15 @@ namespace MVP.Framework.Windows
 
         public async Task<LinkData> Load(string path, ILinkDataManager manager, params object[] args)
         {
-            var prefab = await Resource.instance.LoadAsync<GameObject>(path);
+            var prefab = await Resource.instance.LoadAsync(path);
             if (prefab == null)
             {
-                Log.Window.E($"Factory Load {path} prefab error!");
+                Log.Window.Exception(new Exception($"Factory Load {path} prefab error!"));
             }
 
-            return Utils.Instantitate(prefab, path, manager, args);
+            var data = Utils.Instantitate(prefab, path, manager, args);
+            prefab.Release();
+            return data;
         }
 
         public async Task<LinkData> Instantitate(ILinkDataManager manager, string path, params object[] args)

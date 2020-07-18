@@ -45,7 +45,7 @@ namespace Presenters#NameSpace#
 
 	public class ScriptAutoBuilder
 	{
-	    [MenuItem("MVP/Create & Refresh Script")]
+	    [MenuItem("Tool/MVP/Create & Refresh Script")]
 	    public static void BuildScripts()
 		{
 			foreach (var go in Selection.gameObjects)

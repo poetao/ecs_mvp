@@ -36,7 +36,7 @@ namespace MVP.Framework
             Path.Setup();
             Loading.Setup();
             Store.Setup();
-            Resource.Setup();
+            await Resource.Setup();
             Scene.Setup();
             await Window.Setup();
             Storage.Setup();

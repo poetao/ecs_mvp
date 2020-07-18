@@ -7,7 +7,7 @@ namespace Toybox.Editor
 {
     public class ToyboxTools : MonoBehaviour
     {
-        [MenuItem("MVP/AtlasMaker")]
+        [MenuItem("Tool/AtlasMaker")]
         [Obsolete]
         static private void MakeAtlas()
         {

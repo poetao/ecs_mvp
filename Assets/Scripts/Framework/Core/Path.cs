@@ -8,6 +8,7 @@ namespace MVP.Framework.Core
     public class Path
     {
         public static Path instance { get; private set; }
+        public static string AssetBundleFolder = "AssetBundles";
 
         private Dictionary<string, string> symboles;
 
@@ -33,11 +34,12 @@ namespace MVP.Framework.Core
         {
             switch (type)
             {
-                case TYPE.Prefab:       path = ResolvePrefab(path);     break;
-                case TYPE.Scene:        path = ResolveScene(path);      break;
-                case TYPE.Presenter:    path = ResolvePresenter(path);  break;
-                case TYPE.View:         path = ResolveView(path);       break;
-                case TYPE.Storage:      path = ResolveStorage(path);    break;
+                case TYPE.Prefab:       path = ResolvePrefab(path);      break;
+                case TYPE.Scene:        path = ResolveScene(path);       break;
+                case TYPE.AssetBundle:  path = ResolveAssetBundle(path); break;
+                case TYPE.Presenter:    path = ResolvePresenter(path);   break;
+                case TYPE.View:         path = ResolveView(path);        break;
+                case TYPE.Storage:      path = ResolveStorage(path);     break;
                 default: break;
             }
 
@@ -46,12 +48,19 @@ namespace MVP.Framework.Core
 
         private string ResolvePrefab(string path)
         {
-            return "Prefab/" + path.Replace(".", "/");
+            var finalPath = $"Assets/Prefabs/{path.Replace('.', '/')}.prefab";
+            return finalPath.ToLower();
         }
 
         private string ResolveScene(string path)
         {
             return path;
+        }
+
+        private string ResolveAssetBundle(string path)
+        {
+            path = path.ToLower().Replace("assets/", "");
+            return $"assets/assetBundles/{path}.ab";
         }
 
         private string ResolvePresenter(string path)

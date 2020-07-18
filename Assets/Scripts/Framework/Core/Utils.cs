@@ -14,7 +14,6 @@ namespace MVP.Framework.Core
     {
         public string                   path;
         public Presenter                presenter;
-        public GameObject               prefab;
         public GameObject               node;
         public ILinkDataManager         manager;
         public object                   container;
@@ -24,13 +23,12 @@ namespace MVP.Framework.Core
 
     public static class Utils
     {
-        public static LinkData Instantitate(GameObject prefab, string path, ILinkDataManager manager, params object[] args)
+        public static LinkData Instantitate(Resources.AssetRef prefab, string path, ILinkDataManager manager, params object[] args)
         {
             var data = new LinkData();
-            data.prefab         = prefab;
             data.manager        = manager;
             data.path           = path;
-            data.node           = Object.Instantiate(prefab);
+            data.node           = Resource.instance.Instantiate(prefab);
             data.presenter      = Bridge.instance.component.Link(data, args);
             return data;
         }
