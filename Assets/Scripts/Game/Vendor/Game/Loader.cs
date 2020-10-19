@@ -6,6 +6,7 @@ using UnityEngine;
 using UniRx;
 using MVP.Framework;
 using MVP.Framework.Core;
+using MVP.Framework.Resources;
 
 namespace Vendor.Game
 {
@@ -14,13 +15,13 @@ namespace Vendor.Game
     internal class LoaderAssets
     {
         public GameObject                     scene;
-        public Dictionary<string, GameObject> assets;
+        public Dictionary<string, AssetRef>   assets;
     }
 
     public class Loader
     {
         private List<string>                   resources;
-        private Dictionary<string, GameObject> assets;
+        private Dictionary<string, AssetRef>   assets;
 
         public static Loader Create(string name)
         {
@@ -30,7 +31,7 @@ namespace Vendor.Game
         private Loader(List<string> resources)
         {
             this.resources = resources;
-            this.assets    = new Dictionary<string, GameObject>();
+            this.assets    = new Dictionary<string, AssetRef>();
         }
 
         public async void Startup(params object[] args)
@@ -50,16 +51,15 @@ namespace Vendor.Game
                 return new LoadingOption() {block = false, progress = x.Spawn()};
             };
 
-            async Task<Tuple<string, GameObject>> LoadFunc(string path)
+            async Task<Tuple<string, AssetRef>> LoadFunc(string path)
             {
-                var type = MVP.Framework.Resource.TYPE.Prefab;
-                var go = await MVP.Framework.Resource.instance.LoadAsync<GameObject>(path, type, buildOption(loading));
+                var go = await MVP.Framework.Resource.instance.LoadAsync(path, buildOption(loading));
                 return Tuple.Create(path, go);
             };
 
             var assets = new LoaderAssets();
 
-            var tasks = new List<IObservable<Tuple<string, GameObject>>>();
+            var tasks = new List<IObservable<Tuple<string, AssetRef>>>();
             tasks = resources.Aggregate(tasks, (data, it) =>
             {
                 data.Add(ObservableTask.Create(LoadFunc(it)));
