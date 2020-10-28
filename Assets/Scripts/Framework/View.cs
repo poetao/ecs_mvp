@@ -1,34 +1,47 @@
+using UnityEngine;
+using UniRx;
+using UniRx.Triggers;
 using MVP.Framework.Views;
 
 namespace MVP.Framework
 {
     public class View
     {
-        public void Initialize(Context context)
+        public GameObject gameObject { get; private set; }
+
+        public void Create(Context context)
         {
+            gameObject = context.gameObject;
+            gameObject.OnDestroyAsObservable().Subscribe(x => Dispose());
+
             BuildLinks(context);
             BuildSlots(context);
-	        context.proxy.DestroySelf();
+            context.proxy.DestroySelf();
+        }
+
+        private void Dispose()
+        {
         }
 
         private void BuildLinks(Context context)
         {
-            for (int i = 0; i < context.proxy.linkProperties.Length; ++i)
+            foreach (var linkItem in context.proxy.linkItems)
             {
-                var name        = context.proxy.linkProperties[i];
-                var component   = context.proxy.linkComponents[i];
-                Link.Bind(component, name, context.state, this);
+                var name = linkItem.name;
+                var component = linkItem.gameObject;
+                var compType = linkItem.componentType;
+                Link.Bind(component, compType, name, context.state, this);
             }
         }
 
         private void BuildSlots(Context context)
         {
-            for (int i = 0; i < context.proxy.slotProperties.Length; ++i)
+            foreach (var slotItem in context.proxy.slotItems)
             {
-                var name        = context.proxy.slotProperties[i];
-                var component   = context.proxy.slotComponents[i];
-                var parameters = context.proxy.slotParameters[i].array;
-                var throttle = i < context.proxy.slotThrottles.Length ? context.proxy.slotThrottles[i] : 0;
+                var name = slotItem.name;
+                var component = slotItem.gameObject;
+                var parameters = slotItem.parameters;
+                var throttle = slotItem.throttle;
                 Slot.Bind(component, name, context.presenter, parameters, throttle);
             }
         }

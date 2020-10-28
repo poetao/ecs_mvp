@@ -1,10 +1,14 @@
 using MVP.Framework.Core;
+using MVP.Framework.Views;
 using UnityEngine;
 
-namespace MVP.Framework.Compoents.Windows
+namespace MVP.Framework.Components.Windows
 {
-    public class Container : MonoBehaviour 
+    public class Container : Component
     {
+        [Inspector]
+        public GameObject   content;
+
         private LinkData    data;
 
         public void Bind(object manager, LinkData data)
@@ -12,7 +16,7 @@ namespace MVP.Framework.Compoents.Windows
             this.data                       = data;  
             this.data.container             = this;
 
-            this.data.node.transform.SetParent(transform, false);
+            this.data.node.transform.SetParent(context.gameObject.transform, false);
 
             // @todo wait add more animtion effect when switch window
         }
@@ -29,12 +33,13 @@ namespace MVP.Framework.Compoents.Windows
 
         public void Destroy()
         {
-            Destroy(gameObject);
+            UnityEngine.GameObject.Destroy(context.gameObject);
         }
 
-        public void OnDestroy()
+        protected override void Dispose()
         {
             data.manager.Destroy(data);
+            this.data = null;
         }
     }
 }

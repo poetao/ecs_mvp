@@ -54,7 +54,7 @@ namespace MVP.Framework.Features
 
         public void Create(string path, params object[] args)
         {
-            var instance = Reflection.CreateInstance<Feature>(path);
+            var instance = Reflection.CreateInstance<Feature>(path, null);
 
             var key = GetFeatureStoreKey(path);
             var state = GetManager<Store>().Reference(key);

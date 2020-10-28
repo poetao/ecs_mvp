@@ -969,17 +969,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00f338aa52b31a45b711c8f1a03d229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: Loading
-  linkProperties:
-  - ProgressValue
-  - ProgressText
-  linkComponents:
-  - {fileID: 627673694}
-  - {fileID: 460812627}
-  slotProperties: []
-  slotComponents: []
-  slotParameters: []
-  slotThrottles: []
+  isComponent: 0
+  path: Loading
+  presenterRef: 
+  linkItems:
+  - name: ProgressValue
+    gameObject: {fileID: 627673694}
+    componentType: UnityEngine.UI.Slider
+  - name: ProgressText
+    gameObject: {fileID: 460812627}
+    componentType: UnityEngine.UI.Text
+  slotItems: []
+  inspectorItems: []
 --- !u!224 &8791827235279179560
 RectTransform:
   m_ObjectHideFlags: 0

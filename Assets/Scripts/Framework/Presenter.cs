@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UniRx;
 using MVP.Framework.Core.States;
@@ -14,6 +16,7 @@ namespace MVP.Framework
 		public		IState	state { get; private set; }
         public      CompositeDisposable disposables;
         protected	Context context;
+        protected   Dictionary<string, Presenter> subPresenters;
 
         public Presenter() {}
 
@@ -24,13 +27,39 @@ namespace MVP.Framework
 
 	    public virtual void Dispose()
 	    {
+		    foreach (var subPresenter in subPresenters)
+		    {
+			    subPresenter.Value.Dispose();
+		    }
+		    subPresenters.Clear();
+
 		    if (disposables != null) disposables.Dispose();
+	    }
+
+	    public Presenter Refrence(string path)
+	    {
+		    if (subPresenters.ContainsKey(path))
+		    {
+			    return subPresenters[path];
+		    }
+
+		    return this;
+	    }
+
+	    public void Notify()
+	    {
+		    foreach (var pairs in subPresenters)
+		    {
+			    pairs.Value.Notify();
+		    }
+		    this.state.Notify();
 	    }
 
 		protected virtual void Create(Context context, Builder builder, params object[] args)
         {
-            this.context	= context;
-			this.state		= context.state;
+	        this.subPresenters = new Dictionary<string, Presenter>(); 
+            this.context	   = context;
+			this.state		   = context.state;
         }
     }
 

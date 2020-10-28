@@ -13,7 +13,7 @@ namespace MVP.Framework
 {
     public abstract class Resource
     {
-        public enum TYPE { Prefab, Scene, AssetBundle, Presenter, View, Storage }
+        public enum TYPE { Prefab, Scene, AssetBundle, Presenter, View, Component, Storage }
 
         public static Resource instance { get; private set; }
 
@@ -24,7 +24,9 @@ namespace MVP.Framework
 
         public static async Task Setup()
         {
-#if DEBUG
+#if UNITY_EDITOR
+            instance = new EditorLoader();
+#elif DEBUG
             instance = new LocalAssetBundle();
 #else
             instance = new RemoteAssetBundle();
@@ -82,7 +84,7 @@ namespace MVP.Framework
             return assetRef;
         }
 
-        public async Task<AssetRef> LoadAsync(string path)
+        public virtual async Task<AssetRef> LoadAsync(string path)
         {
             var option = new LoadingOption() { block = true, allowSceneActivation = false, };
             return await LoadAsync(path, TYPE.Prefab, option, "");

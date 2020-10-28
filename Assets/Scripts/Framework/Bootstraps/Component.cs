@@ -1,58 +1,75 @@
 using System.Collections.Generic;
 using MVP.Framework.Core;
-using MVP.Framework.Bootstraps.Components;
 
 namespace MVP.Framework.Bootstraps
 {
-    using LoadingData = Dictionary<string, Views.Proxy>;
+    using LIST_PROXY = List<Views.Proxy>;
+    using LIST_MONO  = List<Framework.Component>;
 
     public class Component
     {
-        private LoadingData loading;
+        private LIST_PROXY loadings;
 
         public Component()
         {
-            loading = new LoadingData(); 
+            loadings = new LIST_PROXY();
         }
 
-        public void Initialization(Views.Proxy proxy, string view)
+        public void Initialization(Views.Proxy proxy)
         {
-            loading.Add(view, proxy);
+            loadings.Add(proxy);
         }
 
         public Presenter Link(LinkData context, params object[] args)
         {
-            var presenter = CreatePresenter(context, args);
-            foreach (var pair in loading)
-            {
-                var view = CreateView(pair.Value.View);
-                view.Initialize(Resolve(presenter, pair.Value));
-            }
-            presenter.state.Notify();
+            var loadingProxys = loadings;
+            loadings = new LIST_PROXY();
 
-	        loading.Clear();
+            var presenter = CreatePresenter(context, args);
+            foreach (var proxy in loadingProxys)
+            {
+                if (proxy.isComponent)
+                {
+                    CreateComponent(presenter, proxy);
+                }
+                else
+                {
+                    CreateView(presenter, proxy);
+                }
+            }
+            presenter.Notify();
+
+	        loadingProxys.Clear();
             return presenter;
         }
 
-        private View CreateView(string view)
+        private void CreateComponent(Presenter presenter, Views.Proxy proxy)
         {
-            var path  = Path.instance.Resolve(view, Resource.TYPE.View);
-            return Reflection.CreateInstance<View>(path);
+            var path  = Path.instance.Resolve(proxy.path, Resource.TYPE.Component, proxy.assembly);
+            var component  = Reflection.CreateInstance<Framework.Component>(path, proxy.assembly);
+            component.Create(ResolveContext(presenter, proxy));
+        }
+
+        private void CreateView(Presenter presenter, Views.Proxy proxy)
+        {
+            var path  = Path.instance.Resolve(proxy.path, Resource.TYPE.View);
+            var view  = Reflection.CreateInstance<View>(path, null);
+            view.Create(ResolveContext(presenter, proxy));
         }
 
         private Presenter CreatePresenter(LinkData data, params object[] args)
         {
-            var context     = new Context(data);
-            var path  = Path.instance.Resolve(data.path, Resource.TYPE.Presenter);
-            return context.Build(path, args);
+            var context     = new Components.Context(data);
+            return context.Build(data.path, args);
         }
 
-        private Views.Context Resolve(Presenter presenter, Views.Proxy proxy)
+        private Views.Context ResolveContext(Presenter presenter, Views.Proxy proxy)
         {
             var data        = new Views.Context();
             data.proxy      = proxy;
-            data.presenter  = presenter;
-            data.state      = presenter.state;
+            data.presenter  = presenter.Refrence(proxy.presenterRef);
+            data.state      = data.presenter.state;
+            data.gameObject = proxy.gameObject;
 
             return data;
         }

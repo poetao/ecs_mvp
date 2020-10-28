@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using MVP.Framework.Core;
-using MVP.Framework.Compoents.Windows;
+using MVP.Framework.Components.Windows;
 
 namespace MVP.Framework.Windows
 {
     public struct ContainerInfo
     {
-        public static string path                = "Framework/Window/Container";
+        public static string path                = "Framework/Windows/Container";
         public static Type component             = typeof(Container);
         public static Resources.AssetRef prefab  = null;
     }
@@ -39,14 +39,16 @@ namespace MVP.Framework.Windows
 
         public async Task<LinkData> Instantitate(ILinkDataManager manager, string path, params object[] args)
         {
-            var container   = Utils.Instantitate(ContainerInfo.prefab, ContainerInfo.path, null) as LinkData;
-            var components  = Utils.GetComponent(container.node, ContainerInfo.component);
-            var component   = components[0] as Container;
+            var containerData   = Utils.Instantitate(ContainerInfo.prefab, ContainerInfo.path, null) as LinkData;
+            var weakRefComp = Component.GetPeer(containerData.node, ContainerInfo.component);
+
+            Component component; weakRefComp.TryGetTarget(out component);
+            var container   = component as Container;
             var data        = await Load(path, manager, args);
 
-            TryAddToCanvas(container.node);
-            component.Bind(manager, data);
-            return component.GetTarget();
+            TryAddToCanvas(containerData.node);
+            container.Bind(manager, data);
+            return container.GetTarget();
         }
 
         private void TryAddToCanvas(GameObject node)

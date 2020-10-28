@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using MVP.Framework.Bootstraps;
@@ -8,33 +9,38 @@ using MVP.Framework.Core.Reflections;
 namespace MVP.Framework.Views
 {
     [Serializable]
-    public class ProxyParameterArray
+    public class ProxyLinkItem
     {
-        public ProxyParameter[] array;
+        public string name;
+        public GameObject gameObject;
+        public String componentType;
+    }
 
-        public ProxyParameter this[int index]
-        {
-            get
-            {
-                return array[index];
-            }
-        }
+    [Serializable]
+    public class ProxySlotItem
+    {
+        public string name;
+        public GameObject gameObject;
+        public float throttle;
+        public List<ProxyParameter> parameters;
+    }
 
-        public ProxyParameterArray(int size)
-        {
-            array = new ProxyParameter[size];
-        }
+    [Serializable]
+    public class ProxyInspectorItem
+    {
+        public string name;
+        public ProxyParameter parameter;
     }
 
     public class Proxy : MonoBehaviour
     {
-        public string           View;
-        public string[]         linkProperties;
-        public GameObject[]     linkComponents;
-        public string[]         slotProperties;
-        public GameObject[]     slotComponents;
-        public ProxyParameterArray[] slotParameters;
-        public float[]          slotThrottles;
+        public bool                     isComponent;
+        public string                   assembly;
+        public string                   path;
+        public string                   presenterRef;
+        public List<ProxyLinkItem>      linkItems;
+        public List<ProxySlotItem>      slotItems;
+        public List<ProxyInspectorItem> inspectorItems;
 
         private void Awake()
         {
@@ -45,7 +51,7 @@ namespace MVP.Framework.Views
                 return;
             }
 
-            Bridge.instance.component.Initialization(this, View);
+            Bridge.instance.component.Initialization(this);
         }
 
 		public void DestroySelf()

@@ -2,52 +2,66 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using UnityEngine;
 
 namespace MVP.Framework.Core.Reflections
 {
     [Serializable]
     public class ProxyParameter
     {
+        private static Dictionary<Type, string> DELEGATE_MAP = new Dictionary<Type, string> {
+            { typeof(bool),        "B" },
+            { typeof(int),         "I" },
+            { typeof(uint),        "I" },
+            { typeof(long),        "L" },
+            { typeof(ulong),       "L" },
+            { typeof(float),       "F" },
+            { typeof(double),      "D" },
+            { typeof(string),      "S" },
+            { typeof(GameObject),  "O" },
+        };
+
         public int intValue;
         public bool boolValue;
         public string stringValue;
         public float floatValue;
         public string useFlag;
+        public GameObject gameObject;
 
         public ProxyParameter(bool boolValue)
         {
             this.boolValue = boolValue;
-            this.intValue = 0;
-            this.stringValue = "";
-            this.floatValue = 0;
             useFlag = "B";
         }
 
         public ProxyParameter(int intValue)
         {
-            this.boolValue = false;
             this.intValue = intValue;
-            this.stringValue = "";
-            this.floatValue = 0;
             useFlag = "I";
         }
 
         public ProxyParameter(float floatValue)
         {
-            this.boolValue = false;
-            this.intValue = 0;
-            this.stringValue = "";
             this.floatValue = floatValue;
             useFlag = "F";
         }
 
         public ProxyParameter(string stringValue)
         {
-            this.boolValue = false;
-            this.intValue = 0;
             this.stringValue = stringValue;
-            this.floatValue = 0;
             useFlag = "S";
+        }
+
+        public ProxyParameter(GameObject gameObject)
+        {
+            this.gameObject = gameObject;
+            useFlag = "O";
+        }
+
+        public ProxyParameter(Type type)
+        {
+            this.useFlag = CastFlag(type);
         }
 
         public object GetObjectValue()
@@ -58,16 +72,21 @@ namespace MVP.Framework.Core.Reflections
                 case "S": return stringValue;
                 case "B": return boolValue;
                 case "F": return floatValue;
+                case "O": return gameObject;
             }
 
             return null;
+        }
+
+        public static string CastFlag(Type type)
+        {
+            if (!DELEGATE_MAP.ContainsKey(type)) return "";
+            return DELEGATE_MAP[type];
         }
     }
 
     public static class MethodDelegateBuilder
     {
-        private static Dictionary<Type, string> DELEGATE_MAP;
-
         public static Func<object[], object> GetMethodDelegate<T>(MethodInfo method, T presenter)
         {
             Func<object[], object> func = null;
@@ -653,31 +672,17 @@ namespace MVP.Framework.Core.Reflections
             var types = from parameter in parameters
                 select parameter.ParameterType;
 
-            if (DELEGATE_MAP == null)
-            {
-                DELEGATE_MAP = new Dictionary<Type, string>()
-                {
-                    { typeof(bool),    "B" },
-                    { typeof(int),     "I" },
-                    { typeof(uint),    "I" },
-                    { typeof(long),    "L" },
-                    { typeof(ulong),   "L" },
-                    { typeof(float),   "F" },
-                    { typeof(double),  "D" },
-                    { typeof(string),  "S" },
-               };
-            }
-
             var result = "";
             foreach (var type in types)
             {
-                if (!DELEGATE_MAP.ContainsKey(type))
+                var flag = ProxyParameter.CastFlag(type);
+                if (string.IsNullOrEmpty(flag))
                 {
                     Log.Reflection.E($"unsupport slot delegate param type {type.Name}");
                     return "ERROR";
                 }
 
-                result += DELEGATE_MAP[type];
+                result += flag;
             }
 
             return result;

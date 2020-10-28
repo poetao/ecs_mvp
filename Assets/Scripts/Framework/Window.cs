@@ -45,7 +45,7 @@ namespace MVP.Framework
 
         public void Close(LinkData data)
         {
-            var container = data.container as Compoents.Windows.Container;
+            var container = data.container as Components.Windows.Container;
             if (!container.Validate())
             {
                 data.subject.OnError(new System.Exception($"{data.path} window not validate"));
@@ -53,20 +53,12 @@ namespace MVP.Framework
             }
 
             container.Destroy();
-            var subject = data.subject;
-            data.subject = null;
-            data.presenter.Dispose();
-
-            subject.OnNext(Unit.Default);
-            subject.OnCompleted();
-            subject.Dispose();
         }
 
         public void Destroy(LinkData data)
         {
             list.Remove(data);
-            if (data.subject != null)
-                data.subject.OnError(new System.Exception($"{data.path} window has be destroy"));
+            data.Destroy();
         }
 
         private async Task<LinkData> Instantitate(string path, params object[] args)

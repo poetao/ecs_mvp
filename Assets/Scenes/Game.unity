@@ -690,17 +690,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00f338aa52b31a45b711c8f1a03d229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: Game
-  linkProperties: []
-  linkComponents: []
-  slotProperties:
-  - DoBack
-  slotComponents:
-  - {fileID: 966251060}
-  slotParameters:
-  - array: []
-  slotThrottles:
-  - 0
+  isComponent: 0
+  path: Game
+  presenterRef: 
+  linkItems: []
+  slotItems:
+  - name: DoBack
+    gameObject: {fileID: 966251060}
+    throttle: 0
+    parameters: []
+  inspectorItems: []
 --- !u!1 &1943347840
 GameObject:
   m_ObjectHideFlags: 0

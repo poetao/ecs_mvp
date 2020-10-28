@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using MVP.Framework.Core.Reflections;
@@ -8,12 +9,18 @@ namespace MVP.Framework.Core
 {
     public static class Reflection
     {
-	    public static Type GetRuntimeType(string path)
+	    public static Type GetRuntimeType(string path, string assemblyName = null)
         {
-            var assembly = Assembly.Load("Game");
+            assemblyName = string.IsNullOrEmpty(assemblyName) ? "Game" : assemblyName;
+            if (assemblyName.Equals("Framework"))
+            {
+                return Type.GetType(path);
+            }
+
+            var assembly = Assembly.Load(assemblyName);
             if (assembly == null)
             {
-                Log.Reflection.W("Game.dll do not loaded");
+                Log.Reflection.W($"{assemblyName}.dll do not loaded");
                 return null;
             }
 
@@ -245,9 +252,9 @@ namespace MVP.Framework.Core
             return method.CreateDelegate(typeof(Func<T1, T2, T3, TReturn>), instance) as Func<T1, T2, T3, TReturn>;
 	    }
 
-        public static T CreateInstance<T>(string path, params object[] args) where T : class
+        public static T CreateInstance<T>(string path, string assembly, params object[] args) where T : class
         {
-            var type = GetRuntimeType(path);
+            var type = GetRuntimeType(path, assembly);
             if (type == null)
             {
                 Log.Reflection.E($"Class do not defined: {path}");
@@ -259,14 +266,22 @@ namespace MVP.Framework.Core
 
         public static T CreateInstance<T>(Type type, params object[] args) where T : class
         {
+            var instance = CreateInstance(type, args);
+            if (instance == null) return default(T);
+
+            return instance as T;
+        }
+
+        public static object CreateInstance(Type type, params object[] args)
+        {
             var instance = Activator.CreateInstance(type, args);
             if (instance == null)
             {
                 Log.Reflection.E($"{type} is not defined");
-                return default(T);
+                return null;
             }
 
-            return instance as T;
+            return instance;
         }
 
         public static Func<object[], object> GetMethodDelegate<T>(string name, T o)

@@ -36,7 +36,6 @@ namespace MVP.Framework.Presenters
 
             data.result = args;
             data.manager.Close(data);
-            data.presenter.Dispose();
         }
     }
 }

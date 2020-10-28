@@ -1,6 +1,7 @@
 using UnityEngine;
 using UniRx;
 using MVP.Framework.Bootstraps;
+using UnityEngine.Experimental.PlayerLoop;
 
 namespace MVP.Framework.Core
 {
@@ -18,7 +19,22 @@ namespace MVP.Framework.Core
         public ILinkDataManager         manager;
         public object                   container;
         public object[]                 result;
-        public Subject<Unit>            subject; 
+        public Subject<Unit>            subject;
+
+        public void Destroy()
+        {
+            this.presenter.Dispose();
+            this.subject.OnNext(Unit.Default);
+            this.subject.OnCompleted();
+            this.subject.Dispose();
+
+            this.path = null;
+            this.presenter = null;
+            this.node = null;
+            this.container = null;
+            this.result = null;
+            this.subject = null;
+        }
     }
 
     public static class Utils

@@ -21,7 +21,7 @@ namespace MVP.Framework.Views
 
     public static class Link
     {
-        public static void Bind(GameObject target, string name, IState store, View view)
+        public static void Bind(GameObject target, string compType, string name, IState store, View view)
         {
             if (target == null || store == null) return;
             if (string.IsNullOrEmpty(name)) return;
@@ -32,13 +32,15 @@ namespace MVP.Framework.Views
 
 	        property.SubscribeWithState(target, (value, o) =>
 	        {
-				if (ProcessText(o, value)) return;
-				if (ProcessSlider(o, value)) return;
-				if (ProcessButton(o, value)) return;
-				if (ProcessAnimator(target, value)) return;
-				if (ProcessAnimation(target, value)) return;
-				if (ProcessGameObject(target, value)) return;
-				// @todo add more compoents support
+		        switch (compType)
+		        {
+			        case "UnityEngine.UI.Text": ProcessText(o, value); return;
+			        case "UnityEngine.UI.Slider": ProcessSlider(o, value); return;
+			        case "UnityEngine.UI.Button": ProcessButton(o, value); return;
+			        case "UnityEngine.Animator": ProcessAnimator(o, value); return;
+			        case "UnityEngine.Animation": ProcessAnimation(o, value); return;
+			        default: ProcessGameObject(o, value); return;
+		        }
 	        }).AddTo(target);
         }
 

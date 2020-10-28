@@ -1146,30 +1146,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f00f338aa52b31a45b711c8f1a03d229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  View: Home
-  linkProperties:
-  - Coin
-  - Gold
-  linkComponents:
-  - {fileID: 1546508360}
-  - {fileID: 1079613553}
-  slotProperties:
-  - DoBack
-  - DoPlay
-  slotComponents:
-  - {fileID: 1141533055}
-  - {fileID: 1794539102}
-  slotParameters:
-  - array: []
-  - array:
+  isComponent: 0
+  path: Home
+  presenterRef: 
+  linkItems:
+  - name: Coin
+    gameObject: {fileID: 1546508360}
+    componentType: UnityEngine.UI.Text
+  - name: Gold
+    gameObject: {fileID: 1079613553}
+    componentType: UnityEngine.UI.Text
+  slotItems:
+  - name: DoBack
+    gameObject: {fileID: 1141533055}
+    throttle: 0
+    parameters: []
+  - name: DoPlay
+    gameObject: {fileID: 1794539102}
+    throttle: 0
+    parameters:
     - intValue: 1
       boolValue: 0
       stringValue: 
       floatValue: 0
       useFlag: I
-  slotThrottles:
-  - 0
-  - 0
+      gameObject: {fileID: 0}
+  inspectorItems: []
 --- !u!224 &8436338222307332656
 RectTransform:
   m_ObjectHideFlags: 0

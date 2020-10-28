@@ -41,6 +41,25 @@ namespace Presenters#NameSpace#
     }
 }
 ";
+
+	    public static string ComponentClass = 
+@"using UnityEngine;
+using UniRx;
+using MVP.Framework.Core;
+
+namespace Components#NameSpace#
+{
+    using Context   = MVP.Framework.Views.Context;
+
+    public class #Class# : MVP.Framework.Component
+    {
+        public override void Create(Context context)
+        {
+            base.Create(context);
+        }
+	}
+}
+";
 	}
 
 	public class ScriptAutoBuilder
@@ -53,11 +72,24 @@ namespace Presenters#NameSpace#
 				var prefab = go.transform.root.gameObject;
 				var relatePath = GetPrefabRelativePath(prefab);
 				BuildViewScript(prefab, GetViewPath(relatePath));
-				BuildPresenterScript(prefab, GetPresenterPath(relatePath));
+				BuildPresenterScript(prefab, GetPresenterPath(relatePath, "Game"));
 			}
 
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
+		}
+
+	    public static void BuildComponentScript(GameObject node, string scriptPath)
+		{
+			if (File.Exists(scriptPath)) return;
+
+			var name		= GetNameFromScriptPath(scriptPath);
+			var nameSpace	= GetNameSpaceFromScriptPath(scriptPath, "Component");
+			var content		= ScriptAutoBuilderTemplate.ComponentClass;
+			content = content.Replace("#NameSpace#", nameSpace);
+			content = content.Replace("#Class#", name);
+
+			WriteFile(content, name, scriptPath); 
 		}
 
 	    public static dynamic BuildViewScript(GameObject node, string scriptPath)
@@ -111,13 +143,26 @@ namespace Presenters#NameSpace#
 			WriteFile(content, name, scriptPath); 
 		}
 
+	    public static string GetComponentPath(string relatePath, string assembly)
+	    {
+		    if (assembly.Equals("Framework"))
+		    {
+				return $"{Application.dataPath}/Scripts/Framework/Components/{relatePath}.cs";
+		    }
+			return $"{Application.dataPath}/Scripts/Game/Component/{relatePath}.cs";
+	    }
+
 	    public static string GetViewPath(string relatePath)
 		{
 			return $"{Application.dataPath}/Scripts/Game/View/{relatePath}.cs";
 		}
 
-	    public static string GetPresenterPath(string relatePath)
+	    public static string GetPresenterPath(string relatePath, string assembly)
 		{
+			if (assembly.Equals("Framework"))
+			{
+				return $"{Application.dataPath}/Scripts/Game/Presenter/Framework/{relatePath}.cs";
+			}
 			return $"{Application.dataPath}/Scripts/Game/Presenter/{relatePath}.cs";
 		}
 
@@ -146,6 +191,9 @@ namespace Presenters#NameSpace#
 					break;
 				case "Presenters":
 					match = Regex.Match(path, @".+Scripts/Game/Presenter(.+)/[^/]+\.cs");
+					break;
+				case "Component":
+					match = Regex.Match(path, @".+Scripts/Game/Component(.+)/[^/]+\.cs");
 					break;
 				default: return "";
 			}

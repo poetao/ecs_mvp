@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4200786401121962273}
-  - component: {fileID: -3063752578750116147}
+  - component: {fileID: 3900448637467665220}
   m_Layer: 5
   m_Name: Container
   m_TagString: Untagged
@@ -36,7 +36,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &-3063752578750116147
+--- !u!114 &3900448637467665220
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -45,6 +45,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 4200786401121962274}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 305e8c125d5575d458f822419e34f235, type: 3}
+  m_Script: {fileID: 11500000, guid: f00f338aa52b31a45b711c8f1a03d229, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isComponent: 1
+  assembly: Framework
+  path: Windows/Container
+  presenterRef: 
+  linkItems: []
+  slotItems: []
+  inspectorItems:
+  - name: content
+    parameter:
+      intValue: 0
+      boolValue: 0
+      stringValue: 
+      floatValue: 0
+      useFlag: O
+      gameObject: {fileID: 0}

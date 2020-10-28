@@ -9,6 +9,7 @@ namespace Views
 
     [Slot("DoLogin")]
     [Slot("SwitchToHome")]
+    [Slot("DoGC")]
 
     public class Login : View
     {

@@ -11,7 +11,8 @@ namespace MVP.Framework.Bootstraps.Components
     {
         public Presenter Build(string path, params object[] args)
         {
-            var instance = Reflection.CreateInstance<Presenter>(path);
+            path = Path.instance.Resolve(path, Resource.TYPE.Presenter);
+            var instance = Reflection.CreateInstance<Presenter>(path, null);
             if (instance == null) return null;
 
             instance.Build(this, args);

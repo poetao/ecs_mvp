@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
@@ -85,7 +86,7 @@ namespace MVP.Framework.Views
 
     public static class Slot
     {
-        public static void Bind(GameObject target, string name, Presenter presenter, ProxyParameter[] proxyParameters, float throttle = 0)
+        public static void Bind(GameObject target, string name, Presenter presenter, List<ProxyParameter> proxyParameters, float throttle = 0)
         {
             if (target == null || presenter == null) return;
             if (string.IsNullOrEmpty(name)) return;
@@ -93,7 +94,7 @@ namespace MVP.Framework.Views
             var action = Core.Reflection.GetMethodActionDelegate<Presenter>(name, presenter);
             if (action == null) return;
 
-            var parameters = Core.Reflection.GetParemeters(proxyParameters);
+            var parameters = Core.Reflection.GetParemeters(proxyParameters.ToArray());
             if (ProcessButton(target, action, parameters, throttle)) return;
             if (ProcessInputField(target, action, parameters, throttle)) return;
 
