@@ -11,25 +11,22 @@ using MVP.Framework.Resources;
 namespace Vendor.Game
 {
     using ProgressDelegateSpawn = Func<ProgressInfo, ProgressDelegate>;
-
-    internal class LoaderAssets
-    {
-        public GameObject                     scene;
-        public Dictionary<string, AssetRef>   assets;
-    }
+    using ASSET_DIC = Dictionary<string, AssetRef>;
 
     public class Loader
     {
+        private string                         name;
         private List<string>                   resources;
-        private Dictionary<string, AssetRef>   assets;
+        private ASSET_DIC                      assets;
 
         public static Loader Create(string name)
         {
-            return new Loader(Resource.Get(name));
+            return new Loader(name, Resource.Get(name));
         }
 
-        private Loader(List<string> resources)
+        private Loader(string name, List<string> resources)
         {
+            this.name      = name;
             this.resources = resources;
             this.assets    = new Dictionary<string, AssetRef>();
         }
@@ -44,20 +41,42 @@ namespace Vendor.Game
             return Utils.Instantitate(assets[path], path, null, args);
         }
 
-        private async Task<LoaderAssets> Load(ILoader<object> loading, List<string> resources)
+        private async Task<Tuple<ASSET_DIC, AsyncOperation>> Load(ILoader<object> loading, List<string> resources)
         {
-            Func<ILoader<object>, LoadingOption> buildOption = (x) =>
+            async Task<Tuple<string, object>> LoadAssetsFunc()
             {
-                return new LoadingOption() {block = false, progress = x.Spawn()};
+                var result = await LoadAssets(loading, resources);
+                return Tuple.Create("assets", result as object);
             };
 
+            async Task<Tuple<string, object>> LoadSceneFunc()
+            {
+                var result = await Scene.instance.Load(this.name, BuildOption(loading));
+                return Tuple.Create("scene", result as object);
+            };
+
+            var tasks = new List<IObservable<Tuple<string, object>>>();
+            tasks.Add(ObservableTask.Create(LoadAssetsFunc()));
+            tasks.Add(ObservableTask.Create(LoadSceneFunc()));
+            var loaders = await tasks.WhenAll();
+
+            ASSET_DIC assetDic = null; AsyncOperation asyncOperation = null;
+            foreach (var loader in loaders)
+            {
+                if (loader.Item1.Equals("assets")) assetDic = loader.Item2 as ASSET_DIC;
+                if (loader.Item1.Equals("scene")) asyncOperation = loader.Item2 as AsyncOperation;
+            }
+
+            return Tuple.Create(assetDic, asyncOperation);
+        }
+
+        private async Task<ASSET_DIC> LoadAssets(ILoader<object> loading, List<string> resources)
+        {
             async Task<Tuple<string, AssetRef>> LoadFunc(string path)
             {
-                var go = await MVP.Framework.Resource.instance.LoadAsync(path, buildOption(loading));
+                var go = await MVP.Framework.Resource.instance.LoadAsync(path, BuildOption(loading));
                 return Tuple.Create(path, go);
             };
-
-            var assets = new LoaderAssets();
 
             var tasks = new List<IObservable<Tuple<string, AssetRef>>>();
             tasks = resources.Aggregate(tasks, (data, it) =>
@@ -65,33 +84,29 @@ namespace Vendor.Game
                 data.Add(ObservableTask.Create(LoadFunc(it)));
                 return data;
             });
+            var results = await tasks.WhenAll();
 
-            var promise = new Subject<int>();
-            var task = tasks.WhenAll().Subscribe(x =>
-            {
-                assets.assets = x.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
-                promise.OnNext(0);
-                promise.OnCompleted();
-            });
-            await promise;
-            promise.Dispose();
-            task.Dispose();
+            return results.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2);
+        }
 
-            return assets;
+        private LoadingOption BuildOption(ILoader<object> loading)
+        {
+            return new LoadingOption() {block = false, progress = loading.Spawn()};
         }
 
         private async Task Run(params object[] args)
         {
             Func<ILoader<object>, Task<object>> load = async (loader) => await Load(loader, resources);
             var loading = (await Scene.instance.Run("Loading", load)) as ILoader<object>;
-            var loaderAssets = await loading.Get() as LoaderAssets;
-            this.assets = loaderAssets.assets;
+            var loaderAssets = await loading.Get() as Tuple<ASSET_DIC, AsyncOperation>;
+            this.assets = loaderAssets.Item1;
 
             var data = new SceneData()
             {
-                name     = "Game",
-                args     = args,
-                option   = new LoadingOption() { block = false },
+                name      = name,
+                args      = args,
+                operation = loaderAssets.Item2,
+                option    = new LoadingOption() { block = false },
             };
             await Scene.instance.Run(data);
         }

@@ -1,10 +1,10 @@
 using UnityEngine;
 using UniRx;
 using MVP.Framework.Bootstraps;
-using UnityEngine.Experimental.PlayerLoop;
 
 namespace MVP.Framework.Core
 {
+    using Container = MVP.Framework.Components.Windows.Container;
     public interface ILinkDataManager
     {
         void Close(LinkData data);
@@ -17,7 +17,7 @@ namespace MVP.Framework.Core
         public Presenter                presenter;
         public GameObject               node;
         public ILinkDataManager         manager;
-        public object                   container;
+        public Container                container;
         public object[]                 result;
         public Subject<Unit>            subject;
 

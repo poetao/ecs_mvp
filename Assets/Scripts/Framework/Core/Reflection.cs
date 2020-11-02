@@ -1,16 +1,18 @@
 using System;
-using System.Collections;
 using System.Linq;
 using System.Reflection;
 using MVP.Framework.Core.Reflections;
-using UnityEngine;
 
 namespace MVP.Framework.Core
 {
     public static class Reflection
     {
+        public static bool useAsmDef { get; set; }
+
 	    public static Type GetRuntimeType(string path, string assemblyName = null)
         {
+            if (!useAsmDef) return Type.GetType(path);
+
             assemblyName = string.IsNullOrEmpty(assemblyName) ? "Game" : assemblyName;
             if (assemblyName.Equals("Framework"))
             {
@@ -180,7 +182,7 @@ namespace MVP.Framework.Core
             return true;
         }
 
-        public static TFunc CreateDelegate<TFunc, TInstanceType>(TInstanceType instance, MethodInfo method) where TFunc : Delegate
+        public static TFunc CreateDelegate<TFunc, TInstanceType>(TInstanceType instance, MethodInfo method) where TFunc : class
 	    {
             if (instance == null) throw new ArgumentNullException(nameof(instance));
             if (method == null) throw new ArgumentNullException(nameof(method));

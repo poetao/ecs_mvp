@@ -27,7 +27,7 @@ namespace MVP.Framework.Windows
         public async Task<LinkData> Load(string path, ILinkDataManager manager, params object[] args)
         {
             var prefab = await Resource.instance.LoadAsync(path);
-            if (prefab == null)
+            if (prefab == null || !prefab.Valid())
             {
                 Log.Window.Exception(new Exception($"Factory Load {path} prefab error!"));
             }
@@ -40,11 +40,12 @@ namespace MVP.Framework.Windows
         public async Task<LinkData> Instantitate(ILinkDataManager manager, string path, params object[] args)
         {
             var containerData   = Utils.Instantitate(ContainerInfo.prefab, ContainerInfo.path, null) as LinkData;
-            var weakRefComp = Component.GetPeer(containerData.node, ContainerInfo.component);
+            var container       = Component.GetPeer(containerData.node, ContainerInfo.component) as Container;
+            var data            = await Load(path, manager, args);
 
-            Component component; weakRefComp.TryGetTarget(out component);
-            var container   = component as Container;
-            var data        = await Load(path, manager, args);
+            #if UNITY_EDITOR
+            containerData.node.name = $"Container({path.Replace('/', '.')})";
+            #endif
 
             TryAddToCanvas(containerData.node);
             container.Bind(manager, data);

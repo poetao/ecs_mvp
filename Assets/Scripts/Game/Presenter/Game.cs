@@ -1,5 +1,6 @@
 using MVP.Framework;
 using MVP.Framework.Presenters;
+using UniRx;
 
 namespace Presenters
 {
@@ -9,7 +10,6 @@ namespace Presenters
     {
         private Window window;
         private Scene  scene;
-        private int    level;
 
 		protected override void Create(Context context, Builder builder, params object[] args)
 	    {
@@ -17,7 +17,7 @@ namespace Presenters
 			window = builder.GetManager<Window>();
 			scene  = builder.GetManager<Scene>();
 
-			this.level = (int)args[0];
+			context.state.Set("level", $"GAME SCENE {args[0]}");
 
 			ShowStage();
 	    }
@@ -29,6 +29,7 @@ namespace Presenters
 
 		public async void ShowStage()
 		{
+            await Observable.TimerFrame(1);
 		}
     }
 }

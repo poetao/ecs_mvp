@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using UniRx;
 
 namespace Vendor.Game
 {
@@ -36,6 +37,7 @@ namespace Vendor.Game
         {
             var loader = Loader.Create(name);
             loader.Startup(args);
+            await Observable.TimerFrame(1);
         }
     }
 }

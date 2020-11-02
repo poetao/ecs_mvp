@@ -45,6 +45,7 @@ namespace MVP.Framework
         public async void LoadScene(string path)
         {
             SceneManager.LoadScene(path);
+            await Observable.TimerFrame(1);
         }
 
         public async Task<AsyncOperation> LoadSceneAsync(string path, LoadingOption option)
@@ -84,7 +85,7 @@ namespace MVP.Framework
             return assetRef;
         }
 
-        public virtual async Task<AssetRef> LoadAsync(string path)
+        public async Task<AssetRef> LoadAsync(string path)
         {
             var option = new LoadingOption() { block = true, allowSceneActivation = false, };
             return await LoadAsync(path, TYPE.Prefab, option, "");
@@ -101,7 +102,7 @@ namespace MVP.Framework
             return await LoadAsync(path, type, option, "");
         }
 
-        public async Task<AssetRef> LoadAsync(string path, TYPE type, LoadingOption option, string assetBundlePath)
+        public virtual async Task<AssetRef> LoadAsync(string path, TYPE type, LoadingOption option, string assetBundlePath)
         {
             path = Core.Path.instance.Resolve(path, type);
             var name = System.IO.Path.GetFileNameWithoutExtension(path);
@@ -133,7 +134,12 @@ namespace MVP.Framework
             return assetRef;
         }
 
-        protected virtual async Task Create()
+        public void Release(AssetRef assetRef)
+        {
+            assetRef.Release();
+        }
+
+        protected async Task Create()
         {
             pathMap             = new Dictionary<string, int>();
             assetMap            = new Dictionary<int, AssetRef>();
@@ -141,7 +147,7 @@ namespace MVP.Framework
             Observable.Interval(TimeSpan.FromSeconds(3)).Subscribe(_ => Sweep());
         }
 
-        protected async Task<AssetBundleManifest> LoadAssetBundleManifest()
+        protected virtual async Task<AssetBundleManifest> LoadAssetBundleManifest()
         {
             var option = new LoadingOption();
             var path= $"Assets/{Path.AssetBundleFolder}/{Path.AssetBundleFolder}";
@@ -224,9 +230,10 @@ namespace MVP.Framework
             return null;
         }
 
-        protected virtual async Task<AssetBundle> LoadAssetBundleSingleAsync(string path, LoadingOption option, float min = 0, float max = 1.0f)
+        protected virtual async Task<AssetBundle> LoadAssetBundleSingleAsync(string path, LoadingOption option, float weight = 1.0f)
         {
             Log.Resource.Exception(new NotImplementedException());
+            await Observable.TimerFrame(1);
             return null;
         }
 
@@ -293,7 +300,7 @@ namespace MVP.Framework
             }
         }
 
-        protected async Task<bool> HookProgress(AsyncOperation operation, ProgressDelegate progress, float min = 0, float max = 1)
+        protected async Task<bool> HookProgress(AsyncOperation operation, ProgressDelegate progress, float weight = 1.0f )
         {
             var promise = new AsyncSubject<int>();
             var disposable = Observable.Interval(TimeSpan.FromSeconds(1/30f))
@@ -301,18 +308,21 @@ namespace MVP.Framework
                 {
                     current = x,
                     total = operation.allowSceneActivation ? 1f : 0.9f,
-                    min = min,
-                    max = max,
+                    weight = weight,
                 })
                 .TakeWhile(x =>
                 {
-                    if (x.current < x.total) return true;
+                    if (x.current < x.total)
+                    {
+                        return true;
+                    }
+                    if (progress != null) progress(x.Percent());
                     promise.OnNext(0);
                     promise.OnCompleted();
                     return false;
                 }).Subscribe(x =>
                 {
-                    if (progress != null) progress(x);
+                    if (progress != null) progress(x.Percent());
                 });
             await promise;
             promise.Dispose();

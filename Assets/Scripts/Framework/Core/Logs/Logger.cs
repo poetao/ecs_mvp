@@ -39,7 +39,11 @@ namespace MVP.Framework.Core.Logs
         private static string GetString(object message)
         {
           if (message == null) return "Null";
-          return message is System.IFormattable formattable ? formattable.ToString(null, CultureInfo.InvariantCulture) : message.ToString();
+
+          var formattable = message as System.IFormattable;
+          if (formattable != null) return formattable.ToString(null, CultureInfo.InvariantCulture);
+
+          return message.ToString();
         }
 
         public Logger(string category, LEVEL level, Object context)

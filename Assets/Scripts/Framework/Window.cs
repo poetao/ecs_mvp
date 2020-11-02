@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MVP.Framework.Components.Windows;
 using MVP.Framework.Core;
 using MVP.Framework.Windows;
 using UniRx;
@@ -57,8 +58,9 @@ namespace MVP.Framework
 
         public void Destroy(LinkData data)
         {
-            list.Remove(data);
             data.Destroy();
+            list.Remove(data);
+            Arrange();
         }
 
         private async Task<LinkData> Instantitate(string path, params object[] args)
@@ -66,16 +68,19 @@ namespace MVP.Framework
             var data = await factory.Instantitate(this, path, args);
             data.subject = new Subject<Unit>();
 
-            list.Add(data);
+            list.Insert(0, data);
 	        Arrange();
 
             return data;
         }
 
 	    private void Arrange()
-	    {
-	        var ret = list.Aggregate<LinkData, int>(0, (context, data) => context + 1);
-            // @todo arrange window by style (eg. popup, dialog ..)
+        {
+            var traitContext = new TraitContext() { visible = true, };
+	        list.Aggregate(traitContext, (context, data) =>
+            {
+                return data.container.Adjust(context);
+            });
 	    }
     }
 }

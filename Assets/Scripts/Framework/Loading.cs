@@ -18,13 +18,30 @@ namespace MVP.Framework
 
     public class ProgressInfo
     {
-        public float current = 0f;
-        public float total   = 1.0f;
-        public float min     = 0f;
-        public float max     = 1.0f;
+        public float current;
+        public float total;
+        public float weight;
+
+        public ProgressInfo()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            current = 0f;
+            total   = 1.0f;
+            weight  = 1.0f;
+        }
+
+        public float Percent()
+        {
+            var percent = Math.Abs(total - 0) < float.Epsilon ? 0 : current / total;
+            return Math.Min(1, percent);
+        }
     }
 
-    public delegate void ProgressDelegate(ProgressInfo progress);
+    public delegate void ProgressDelegate(float current);
     public struct LoadingOption
     {
         public bool             block;
@@ -59,26 +76,10 @@ namespace MVP.Framework
 
         public async Task<T> Run<T>(Func<Task<T>> asynFunc, LoadingOption option)
         {
-            async Task<T> Run()
-            {
-                var time = DateTime.Now.Ticks;
-                try
-                {
-                    return await asynFunc();
-                }
-                catch (Exception e)
-                {
-                    if (!(e is LoadingTimeoutError)) throw e;
-                    var retry = await Retry(time);
-                    if (retry) return await Run();
-                    return default(T);
-                }
-            }
-
             try
             {
                 if (option.block) Show();
-                return await Run();
+                return await RunInner(asynFunc);
             }
             finally
             {
@@ -86,9 +87,25 @@ namespace MVP.Framework
             }
         }
 
+        private async Task<T> RunInner<T>(Func<Task<T>> asynFunc)
+        {
+            var time = DateTime.Now.Ticks;
+            try
+            {
+                return await asynFunc();
+            }
+            catch (Exception e)
+            {
+                if (!(e is LoadingTimeoutError)) throw e;
+                var retry = await Retry(time);
+                if (retry) return await RunInner(asynFunc);
+                return default(T);
+            }
+        }
+
         public async Task<T> Wrap<T>(Func<Task<T>> asynFunc, LoadingOption option)
         {
-            async Task<T> Func()
+            Func<Task<T>> WrapInner = async () =>
             {
                 try
                 {
@@ -100,9 +117,9 @@ namespace MVP.Framework
                     Log.Framework.Error(e);
                     throw new LoadingTimeoutError();
                 }
-            }
+            };
 
-            return await Run<T>(Func, option);
+            return await Run<T>(WrapInner, option);
         }
 
         private void Show()

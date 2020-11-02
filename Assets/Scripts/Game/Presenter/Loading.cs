@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using MVP.Framework;
 using MVP.Framework.Presenters;
+using UniRx;
 
 namespace Presenters
 {
@@ -12,6 +13,7 @@ namespace Presenters
 
     public class Loading : Presenter, ILoader<object>
     {
+        private ProgressInfo       now;
         private List<ProgressInfo> list;
         private Func<Task<object>> promise;
 
@@ -23,17 +25,19 @@ namespace Presenters
             var load = args[0] as Func<ILoader<object>, Task<object>>;
             this.promise = async () => { return await load(this); };
             this.list    = new List<ProgressInfo>();
+            this.now     = new ProgressInfo();
+            await Observable.TimerFrame(1);
         }
 
         public ProgressDelegate Spawn(ProgressInfo info)
         {
-            info = info ?? new ProgressInfo();
-            ProgressDelegate progressDelegate = (ProgressInfo nowInfo) =>
+            var addInfo = info ?? new ProgressInfo();
+            list.Add(addInfo);
+            ProgressDelegate progressDelegate = (current) =>
             {
-                info = nowInfo;
+                addInfo.current = current;
                 Update();
             };
-            list.Add(info);
 
             return progressDelegate;
         }
@@ -50,14 +54,14 @@ namespace Presenters
         {
             if (list == null || list.Count == 0) return;
 
-	        var now = list.Aggregate((data, it) =>
+            now.current = now.total = 0.0f;
+	        list.Aggregate(now, (data, it) =>
             {
-                data.current += it.current;
-                data.total   += it.total;
+                data.current += it.current * it.weight;
+                data.total   += it.total * it.weight;
                 return data;
             });
-            var isZero = Math.Abs(now.total - 0) < float.Epsilon;
-            var percent = ( isZero ? 1 : Mathf.Floor(now.current / now.total)) * 100;
+            var percent = Mathf.Floor(now.Percent() * 100);
             state.Set("percent", percent);
         }
     }

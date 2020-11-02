@@ -1,9 +1,8 @@
-using MVP.Framework.Core;
 using MVP.Framework.Views;
 
 namespace MVP.Framework.Components.Windows
 {
-    public class Dialog : Component, ITrait
+    public class Floater : Component, ITrait
     {
         [Inspector]
         public bool animation;
@@ -13,14 +12,14 @@ namespace MVP.Framework.Components.Windows
         public void Bind(Container container)
         {
             this.container = container;
-            if (animation) container.PlayAnimation("open");
+            if (animation) this.container.PlayAnimation("open");
         }
 
         public TraitContext Adjust(TraitContext context)
         {
             return new TraitContext()
             {
-                barrier = true,
+                barrier = false,
                 opaque = false,
             };
         }

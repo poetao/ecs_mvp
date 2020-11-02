@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using MVP.Framework.Core;
 
 namespace Bootstraps
 {
@@ -8,6 +9,7 @@ namespace Bootstraps
         [RuntimeInitializeOnLoadMethod]
         public static void Constructor()
         {
+            Reflection.useAsmDef = true;
             MVP.Framework.Bootstrap.Start(new Startup());
         }
         

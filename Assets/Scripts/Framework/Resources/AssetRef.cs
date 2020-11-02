@@ -38,6 +38,11 @@ namespace MVP.Framework.Resources
             time = DateTime.Now.Ticks;
         }
 
+        public bool Valid()
+        {
+            return asset != null;
+        }
+
         public UnityEngine.Object Get()
         {
             return asset;

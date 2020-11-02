@@ -691,9 +691,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isComponent: 0
+  assembly: 
   path: Game
   presenterRef: 
-  linkItems: []
+  linkItems:
+  - name: level
+    gameObject: {fileID: 997721015}
+    componentType: UnityEngine.UI.Text
   slotItems:
   - name: DoBack
     gameObject: {fileID: 966251060}

@@ -82,7 +82,7 @@ namespace Presenters
             System.GC.Collect();
             System.GC.Collect();
             System.GC.Collect();
-            window.Wait("Framework/Window/Message", "wutao");
+            window.Wait("Framework/Windows/Message", "wutao");
         }
     }
 }

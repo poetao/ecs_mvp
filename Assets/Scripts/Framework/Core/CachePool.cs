@@ -18,7 +18,8 @@ namespace MVP.Framework.Core
         /// <param name="threadSafe">如果获取缓存的过程可能在不同线程，则设置此值为 true，以便让缓存过程是线程安全的。</param>
         public CachePool(Func<TSource, TCache> conversion, bool threadSafe = false)
         {
-            _convert = conversion ?? throw new ArgumentNullException(nameof(conversion));
+            if (conversion == null) throw new ArgumentNullException(nameof(conversion));
+            _convert = conversion;
             _locker = threadSafe ? new object() : null;
         }
 
@@ -52,28 +53,29 @@ namespace MVP.Framework.Core
         /// </summary>
         private TCache GetOrCacheValue(TSource source)
         {
-            // 如果不需要加锁，则直接返回值。
-            if (_locker == null)
-            {
-                return GetOrCacheValue();
-            }
-
-            // 如果需要加锁，则加锁后返回值。
-            lock (_locker)
-            {
-                return GetOrCacheValue();
-            }
-
             // 如果存在缓存，则获取缓存；否则从源值转换成缓存。
-            TCache GetOrCacheValue()
+            Func<TCache> GetOrCacheValueInner = ()=>
             {
-                if (!_cacheDictionary.TryGetValue(source, out var cache))
+                TCache cache;
+                if (!_cacheDictionary.TryGetValue(source, out cache))
                 {
                     cache = _convert(source);
                     _cacheDictionary[source] = cache;
                 }
 
                 return cache;
+            };
+
+            // 如果不需要加锁，则直接返回值。
+            if (_locker == null)
+            {
+                return GetOrCacheValueInner();
+            }
+
+            // 如果需要加锁，则加锁后返回值。
+            lock (_locker)
+            {
+                return GetOrCacheValueInner();
             }
         }
     }

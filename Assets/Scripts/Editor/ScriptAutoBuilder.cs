@@ -43,15 +43,11 @@ namespace Presenters#NameSpace#
 ";
 
 	    public static string ComponentClass = 
-@"using UnityEngine;
-using UniRx;
-using MVP.Framework.Core;
+@"using MVP.Framework.Views;
 
-namespace Components#NameSpace#
+namespace #AssemblySpace#Components#NameSpace#
 {
-    using Context   = MVP.Framework.Views.Context;
-
-    public class #Class# : MVP.Framework.Component
+    public class #Class# : Component
     {
         public override void Create(Context context)
         {
@@ -79,15 +75,17 @@ namespace Components#NameSpace#
 			AssetDatabase.Refresh();
 		}
 
-	    public static void BuildComponentScript(GameObject node, string scriptPath)
-		{
+	    public static void BuildComponentScript(GameObject node, string scriptPath, string assembly)
+	    {
 			if (File.Exists(scriptPath)) return;
 
 			var name		= GetNameFromScriptPath(scriptPath);
 			var nameSpace	= GetNameSpaceFromScriptPath(scriptPath, "Component");
+			var assemblySpace	= GetAssemblySpace(assembly);
 			var content		= ScriptAutoBuilderTemplate.ComponentClass;
 			content = content.Replace("#NameSpace#", nameSpace);
 			content = content.Replace("#Class#", name);
+			content = content.Replace("#AssemblySpace#", assemblySpace);
 
 			WriteFile(content, name, scriptPath); 
 		}
@@ -194,10 +192,20 @@ namespace Components#NameSpace#
 					break;
 				case "Component":
 					match = Regex.Match(path, @".+Scripts/Game/Component(.+)/[^/]+\.cs");
+					if (match.Length <= 0)
+					{
+						match = Regex.Match(path, @".+Scripts/Framework/Components(.+)/[^/]+\.cs");
+					}
 					break;
 				default: return "";
 			}
 			return match.Groups[1].Value.Replace("/", ".");
+		}
+
+		private static string GetAssemblySpace(string assembly)
+		{
+			if (assembly.Equals("Framework")) return "MVP.Framework.";
+			return "";
 		}
 
 		private static string GetNameFromScriptPath(string path)

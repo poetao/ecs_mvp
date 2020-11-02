@@ -27,7 +27,7 @@ namespace Toybox.Editor
                     {
                         Directory.CreateDirectory(Application.dataPath + "/" + prefabDir);
                     }
-                    _ = PrefabUtility.CreatePrefab("Assets/" + prefabDir + "/" + sprite.name + ".prefab", go);
+                    PrefabUtility.CreatePrefab("Assets/" + prefabDir + "/" + sprite.name + ".prefab", go);
                     DestroyImmediate(go);
                 }
             }

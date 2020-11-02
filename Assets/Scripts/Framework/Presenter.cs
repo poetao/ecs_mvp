@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using MVP.Framework.Core;
 using UnityEngine;
 using UniRx;
 using MVP.Framework.Core.States;
@@ -22,7 +23,14 @@ namespace MVP.Framework
 
 	    public void Build(Builder builder, params object[] args)
 	    {
-	        Create(Context.Create(builder), builder, args);
+		    try
+		    {
+			    Create(Context.Create(builder), builder, args);
+		    }
+		    catch (Exception e)
+		    {
+			    Log.Framework.Exception(e);
+		    }
 	    }
 
 	    public virtual void Dispose()
@@ -53,6 +61,11 @@ namespace MVP.Framework
 			    pairs.Value.Notify();
 		    }
 		    this.state.Notify();
+	    }
+
+	    public void Close(params object[] args)
+	    {
+		    context.Close(args);
 	    }
 
 		protected virtual void Create(Context context, Builder builder, params object[] args)

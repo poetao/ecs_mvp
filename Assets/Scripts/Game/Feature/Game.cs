@@ -1,6 +1,7 @@
 using MVP.Framework;
 using MVP.Framework.Core.States;
 using MVP.Framework.Features;
+using UniRx;
 
 namespace Features
 {
@@ -14,7 +15,8 @@ namespace Features
 
         public async void Play(int level)
         {
-            GameManager.Play($"Level{level}", level);
+            GameManager.Play("Game", level);
+            await Observable.TimerFrame(1);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace MVP.Framework
     {
         public static Store instance { get; private set; }
 
-        public State state { get; private set; }
+        public Core.State state { get; private set; }
         
         public static void Setup()
         {
@@ -17,7 +17,7 @@ namespace MVP.Framework
 
         private Store()
         {
-            state = new State();
+            state = new Core.State();
         }
 
         public void Set<T>(string path, T value)

@@ -246,7 +246,7 @@ namespace MVP.Editors.Inspector
 		private void BuildComponentScript(GameObject node, string relatePath, string assembly)
 		{
 			var path = ScriptAutoBuilder.GetComponentPath(relatePath, assembly);
-			ScriptAutoBuilder.BuildComponentScript(node, path);
+			ScriptAutoBuilder.BuildComponentScript(node, path, assembly);
 		}
 
 		private void BuildViewScript(GameObject node, string relatePath)
