@@ -15,6 +15,8 @@ namespace MVP.Framework
     public class Root
     {
         public static Root instance { get; private set; }
+        public Camera UICamera { get; private set; }
+        public GameObject ViewPort { get; private set; }
 
         public static async Task<Root> Create(IStartupContext context)
         {
@@ -48,6 +50,8 @@ namespace MVP.Framework
         private async Task Run(IStartupContext context)
         {
             var root = await Window.instance.Load("Framework/Root");
+            ViewPort = root.node.transform.Find("Viewport").gameObject;
+            UICamera = root.node.transform.Find("UICamera").GetComponent<Camera>();
             GameObject.DontDestroyOnLoad(root.node);
             await Scene.instance.Run(context.Setup());
         }

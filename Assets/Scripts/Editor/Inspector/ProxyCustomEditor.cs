@@ -11,6 +11,10 @@ namespace MVP.Editors.Inspector
 	[CanEditMultipleObjects, CustomEditor(typeof(Proxy))]
 	public class ProxyCustomEditor : Editor
 	{
+		private bool foldoutLinkItems = true;
+		private bool foldoutSlotItems = true;
+		private bool foldoutCompItems = true;
+
 		public override void OnInspectorGUI()
 		{
 			serializedObject.Update();
@@ -29,11 +33,8 @@ namespace MVP.Editors.Inspector
 
 		private void InspectorBaseInfo(GameObject node, string assembly)
 		{
-			var isComponentProperty = this.serializedObject.FindProperty("isComponent");
-			EditorGUILayout.PropertyField(isComponentProperty);
-			var isComponent = isComponentProperty.boolValue;
+			var isComponent = InspectorType();
 			if (isComponent) InspectorAssemble();
-
 			var path = this.serializedObject.FindProperty("path");
 			EditorGUILayout.BeginHorizontal();
 			EditorGUILayout.PropertyField(path);
@@ -52,7 +53,7 @@ namespace MVP.Editors.Inspector
 			}
 			EditorGUILayout.EndHorizontal();
 
-			EditorGUI.indentLevel += 2;
+			EditorGUI.indentLevel += 1;
 			EditorGUILayout.BeginHorizontal();
 			var presenter = this.serializedObject.FindProperty("presenterRef");
 			EditorGUILayout.PropertyField(presenter);
@@ -63,20 +64,30 @@ namespace MVP.Editors.Inspector
 				BuildPresenterScript(node, $"{path.stringValue}{refPath}", assembly);
 			}
 			EditorGUILayout.EndHorizontal();
-			EditorGUI.indentLevel -= 2;
+			EditorGUI.indentLevel -= 1;
 
 			serializedObject.ApplyModifiedProperties();
+		}
+
+		private bool InspectorType()
+		{
+			var isComponentProperty = this.serializedObject.FindProperty("isComponent");
+			var types = new List<string> {"View", "Component"};
+			var selectedIdx = types.IndexOf(isComponentProperty.boolValue ? "Component" : "View");
+			selectedIdx = selectedIdx == -1 ? types.Count - 1 : selectedIdx;
+			var newSelectedIdx = EditorGUILayout.Popup("Type", selectedIdx, types.ToArray());
+			isComponentProperty.boolValue = types[newSelectedIdx] == "Component";
+			return isComponentProperty.boolValue;
 		}
 
 		private void InspectorAssemble()
 		{
 			EditorGUILayout.BeginHorizontal();
 			var assembleProperty = this.serializedObject.FindProperty("assembly");
-			EditorGUILayout.PropertyField(assembleProperty);
 			var assemblies = new List<string> {"Framework", "Game"};
 			var selectedIdx = assemblies.IndexOf(assembleProperty.stringValue);
 			selectedIdx = selectedIdx == -1 ? assemblies.Count - 1 : selectedIdx;
-			var newSelectedIdx = EditorGUILayout.Popup(selectedIdx, assemblies.ToArray(), GUILayout.MaxWidth(125));
+			var newSelectedIdx = EditorGUILayout.Popup("Assembly", selectedIdx, assemblies.ToArray());
 			assembleProperty.stringValue = assemblies[newSelectedIdx];
 			EditorGUILayout.EndHorizontal();
 		}
@@ -91,7 +102,8 @@ namespace MVP.Editors.Inspector
 
 			var linkItems = this.serializedObject.FindProperty("linkItems");
 			linkItems.arraySize = names.Length;
-			if (EditorGUILayout.PropertyField(linkItems))
+			foldoutLinkItems = EditorGUILayout.Foldout(foldoutLinkItems, "Link Items");
+			if (foldoutLinkItems)
 			{
 				EditorGUI.indentLevel++;
 				for (int i = 0; i < linkItems.arraySize; ++i)
@@ -121,7 +133,7 @@ namespace MVP.Editors.Inspector
 			components.Insert(0, "UnityEngine.GameObject");
 			var selectedIdx = components.IndexOf(componentType);
 			selectedIdx = selectedIdx == -1 ? components.Count - 1 : selectedIdx;
-			var newSelectedIdx = EditorGUILayout.Popup(selectedIdx, components.ToArray(), GUILayout.MaxWidth(135));
+			var newSelectedIdx = EditorGUILayout.Popup(selectedIdx, components.ToArray(), GUILayout.MaxWidth(140));
 
 			return components[newSelectedIdx];
 		}
@@ -136,7 +148,8 @@ namespace MVP.Editors.Inspector
 			
 			var slotItems = this.serializedObject.FindProperty("slotItems");
 			slotItems.arraySize = length;
-			if (EditorGUILayout.PropertyField(slotItems))
+			foldoutSlotItems = EditorGUILayout.Foldout(foldoutSlotItems, "Slot Items");
+			if (foldoutSlotItems)
 			{
 				EditorGUI.indentLevel++;
 				for (int i = 0; i < slotItems.arraySize; ++i)
@@ -170,7 +183,8 @@ namespace MVP.Editors.Inspector
 
 			var inspectorItems = this.serializedObject.FindProperty("inspectorItems");
 			inspectorItems.arraySize = fields.Count();
-			if (EditorGUILayout.PropertyField(inspectorItems))
+			foldoutCompItems = EditorGUILayout.Foldout(foldoutCompItems, "Comp Items");
+			if (foldoutCompItems)
 			{
 				var i = 0;
 				foreach (var field in fields)

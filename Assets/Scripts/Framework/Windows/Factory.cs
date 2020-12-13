@@ -44,7 +44,7 @@ namespace MVP.Framework.Windows
             var data            = await Load(path, manager, args);
 
             #if UNITY_EDITOR
-            containerData.node.name = $"Container({path.Replace('/', '.')})";
+            containerData.node.name = $"{path.Replace('/', '.')}(Container)";
             #endif
 
             TryAddToCanvas(containerData.node);
@@ -54,15 +54,9 @@ namespace MVP.Framework.Windows
 
         private void TryAddToCanvas(GameObject node)
         {
-            var gameObjects = SceneManager.GetActiveScene().GetRootGameObjects();
-            foreach (var gameObject in gameObjects)
-            {
-                var canvas = gameObject.GetComponent<Canvas>();
-                if (canvas == null) continue;
+            if (Root.instance.ViewPort == null) return;
 
-                node.transform.SetParent(canvas.transform, false);
-                return;
-            }
+            node.transform.SetParent(Root.instance.ViewPort.transform, false);
         }
     }
 }

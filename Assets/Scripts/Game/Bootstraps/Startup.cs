@@ -9,7 +9,6 @@ namespace Bootstraps
         [RuntimeInitializeOnLoadMethod]
         public static void Constructor()
         {
-            Reflection.useAsmDef = true;
             MVP.Framework.Bootstrap.Start(new Startup());
         }
         

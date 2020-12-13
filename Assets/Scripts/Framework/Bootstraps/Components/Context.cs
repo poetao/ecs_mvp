@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using MVP.Framework.Core;
 using MVP.Framework.Core.States;
 using MVP.Framework.Features;
@@ -19,14 +18,14 @@ namespace MVP.Framework.Bootstraps.Components
             return instance;
         }
 
-        public LinkData                     data { get; private set; }
+        public LinkData                     Data { get; private set; }
 
         private Dictionary<Type, object>    managers;
         private IState                      state;
 
         public Context(LinkData data)
         {
-            this.data = data;
+            this.Data = data;
             managers = new Dictionary<Type, object>
             {
                 { typeof(Scene),        Scene.instance      },
@@ -45,9 +44,9 @@ namespace MVP.Framework.Bootstraps.Components
             return GetManager<Manager>().GetFeature<T>();
         }
 
-        public void UseState(IState state)
+        public void UseState(IState newState)
         {
-            this.state = state;
+            this.state = newState;
         }
 
         public IState TakeState()

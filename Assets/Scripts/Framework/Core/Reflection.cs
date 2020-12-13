@@ -7,7 +7,7 @@ namespace MVP.Framework.Core
 {
     public static class Reflection
     {
-        public static bool useAsmDef { get; set; }
+        public static bool useAsmDef { get; set; } = true;
 
 	    public static Type GetRuntimeType(string path, string assemblyName = null)
         {

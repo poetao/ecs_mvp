@@ -13,8 +13,7 @@ namespace MVP.Framework.Presenters
 
         public static Context Create(Builder builder)
         {
-            var state = builder.TakeState();
-            if (state == null) state = new Core.State();
+            var state = builder.TakeState() ?? new Core.State();
             return new Context(builder, state);
         }
 
@@ -22,7 +21,7 @@ namespace MVP.Framework.Presenters
         {
             this.state      = state;
             this.builder    = builder;
-            this.data       = builder.data;
+            this.data       = builder.Data;
         }
 
         public Presenter Build(string path, params object[] args)

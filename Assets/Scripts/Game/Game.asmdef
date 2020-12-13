@@ -1,14 +1,19 @@
-﻿{
-	"name": "Game",
+{
+    "name": "Game",
     "references": [
         "UnityEngine",
         "UniRx",
         "AsyncAwaitUtil",
-        "MVP.Framework",
-        "Patch"
+        "Patch",
+        "Framework"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

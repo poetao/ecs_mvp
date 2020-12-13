@@ -1,12 +1,17 @@
 {
-    "name": "MVP.Framework",
+    "name": "Framework",
     "references": [
         "UnityEngine",
         "UniRx",
         "AsyncAwaitUtil"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
