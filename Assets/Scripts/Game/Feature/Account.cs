@@ -26,9 +26,9 @@ namespace Features
         public void LocalLogin(AccountData data)
         {
             var dictionary = new Dictionary<string, Any>() {
-                {"Account", new Any(data) },
-                {"User", new Any("") },
-                {"Game", new Any("") },
+                {"Account", Any.Create(data) },
+                {"User", Any.Create("") },
+                {"Game", Any.Create("") },
             };
             OnLogin(dictionary);
         }
@@ -41,7 +41,7 @@ namespace Features
 
         public bool IsLogin()
         {
-            return state.Get<bool>("isLogin");
+            return state.Get("isLogin").BoolValue();
         }
 
         public void OnLogin(Dictionary<string, Any> data)

@@ -11,7 +11,7 @@ namespace Views
 
     public class Home : View
     {
-        public string Coin(long coin) { return $"C: {coin}"; }
-        public string Gold(long gold) { return $"G: {gold}"; }
+        public string Coin(ulong coin) { return $"C: {coin}"; }
+        public string Gold(ulong gold) { return $"G: {gold}"; }
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Reflection;
 using MVP.Framework.Core.Reflections;
+using MVP.Framework.Core.States;
 
 namespace MVP.Framework.Core
 {
@@ -286,7 +287,7 @@ namespace MVP.Framework.Core
             return instance;
         }
 
-        public static Func<object[], object> GetMethodDelegate<T>(string name, T o)
+        public static Func<Any[], Any> GetMethodDelegate<T>(string name, T o)
         {
             var method = GetMethod(o, name);
 	        if (method == null) return null;
@@ -294,7 +295,7 @@ namespace MVP.Framework.Core
             return MethodDelegateBuilder.GetMethodDelegate(method, o);
         }
 
-        public static Action<object[]> GetMethodActionDelegate<T>(string name, T o)
+        public static Action<Any[]> GetMethodActionDelegate<T>(string name, T o)
         {
             var method = GetMethod(o, name);
 	        if (method == null) return null;
@@ -302,10 +303,10 @@ namespace MVP.Framework.Core
             return MethodDelegateBuilder.GetMethodActionDelegate(method, o);
         }
 
-        public static object[] GetParemeters(ProxyParameter[] proxyParameters)
+        public static Any[] GetParemeters(ProxyParameter[] proxyParameters)
         {
             var parameters = (from proxyParmeter in proxyParameters
-                select proxyParmeter.GetObjectValue()).ToArray();
+                select proxyParmeter.GetAnyValue()).ToArray();
             return parameters;
         }
     }

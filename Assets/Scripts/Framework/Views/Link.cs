@@ -34,12 +34,12 @@ namespace MVP.Framework.Views
 	        {
 		        switch (compType)
 		        {
-			        case "UnityEngine.UI.Text": ProcessText(o, value); return;
-			        case "UnityEngine.UI.Slider": ProcessSlider(o, value); return;
-			        case "UnityEngine.UI.Button": ProcessButton(o, value); return;
-			        case "UnityEngine.Animator": ProcessAnimator(o, value); return;
-			        case "UnityEngine.Animation": ProcessAnimation(o, value); return;
-			        default: ProcessGameObject(o, value); return;
+			        case "UnityEngine.UI.Text": ProcessText(o, value); break;
+			        case "UnityEngine.UI.Slider": ProcessSlider(o, value); break;
+			        case "UnityEngine.UI.Button": ProcessButton(o, value); break;
+			        case "UnityEngine.Animator": ProcessAnimator(o, value); break;
+			        case "UnityEngine.Animation": ProcessAnimation(o, value); break;
+			        default: ProcessGameObject(o, value); break;
 		        }
 	        }).AddTo(target);
         }
@@ -52,11 +52,7 @@ namespace MVP.Framework.Views
 	        var parameters = method.GetParameters();
 	        if (parameters.Length <= 0) return null;
 	        var properties = (from parameterInfo in parameters
-		        select store.GetObservable(parameterInfo.Name).Select(x =>
-		        {
-			        if (!x.Equals(Any.Empty)) return x.Object;
-			        return new Any(parameterInfo.ParameterType).Object;
-		        })).ToArray();
+		        select store.GetObservable(parameterInfo.Name).Select(x => x)).ToArray();
 
             var action = Core.Reflection.GetMethodDelegate(name, view);
             if (action == null) return null;
@@ -65,7 +61,7 @@ namespace MVP.Framework.Views
 	        var observable = Observable.CombineLatest(properties).Select(x =>
 	        {
 		        var args = x.ToArray();
-		        return new Any(action(args));
+		        return action(args);
 	        });
 	        return observable;
         }
@@ -77,13 +73,13 @@ namespace MVP.Framework.Views
 
             if (property.Is<string>())
             {
-	            text.text = property.Value<string>();
+	            text.text = property.StringValue();
 		        return true;
 		    }
 
-            if (property.Type.IsValueType && !property.Is<bool>())
+            if (property.IsValueType() && !property.Is<bool>())
             {
-	            text.text = property.Object.ToString();
+	            text.text = property.ValueString();
 		        return true;
 		    }
 
@@ -97,7 +93,7 @@ namespace MVP.Framework.Views
 
             if (property.Is<bool>())
             {
-	            button.interactable = property.Value<bool>();
+	            button.interactable = property.BoolValue();
 		        return true;
 		    }
 
@@ -111,13 +107,13 @@ namespace MVP.Framework.Views
 
             if (property.Is<bool>())
             {
-	            slider.interactable = property.Value<bool>();
+	            slider.interactable = property.BoolValue();
 		        return true;
 		    }
 
             if (property.Is<float>())
             {
-	            slider.value = property.Value<float>();
+	            slider.value = property.FloatValue();
 		        return true;
             }
 
@@ -131,7 +127,7 @@ namespace MVP.Framework.Views
 
             if (property.Is<string>())
             {
-	            var name = property.Value<string>();
+	            var name = property.StringValue();
 	            if (!string.IsNullOrEmpty(name)) animation.Play(name);
 				return true;
             }
@@ -146,7 +142,7 @@ namespace MVP.Framework.Views
 
             if (property.Is<string>())
             {
-	            var name = property.Value<string>();
+	            var name = property.StringValue();
 	            if (!string.IsNullOrEmpty(name)) animator.SetTrigger(name);
 		        return true;
             }
@@ -158,7 +154,7 @@ namespace MVP.Framework.Views
 	    {
             if (property.Is<bool>())
             {
-	            target.SetActive(property.Value<bool>());
+	            target.SetActive(property.BoolValue());
 		        return true;
 		    }
 

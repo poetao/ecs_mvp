@@ -26,7 +26,7 @@ namespace MVP.Framework.Components.Windows
         private void SubScrible()
         {
             this.context.state.GetObservable("text")
-                .Select(x => x.Value<string>())
+                .Select(x => x.RefValue<string>())
                 .Subscribe(x => text.GetComponent<Text>().text = x);
             btnClose.GetComponent<Button>().OnClickAsObservable()
                 .Subscribe(x => context.presenter.Close());

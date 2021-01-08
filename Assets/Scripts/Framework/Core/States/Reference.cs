@@ -45,11 +45,6 @@ namespace MVP.Framework.Core.States
             return this.state.Get(map(path));
         }
 
-        public T Get<T>(string path)
-        {
-            return this.state.Get<T>(map(path));
-        }
-
         public IObservable<Any> GetObservable(string path)
         {
             return this.state.GetObservable(map(path));

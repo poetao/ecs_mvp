@@ -39,7 +39,7 @@ namespace Components.Framework
         private void Subscribe()
         {
             context.state.GetObservable("data")
-                .Select(x => x.Value<LIST_INFO>())
+                .Select(x => x.RefValue<LIST_INFO>())
                 .Subscribe(x =>
             {
                 UpdateList(x);

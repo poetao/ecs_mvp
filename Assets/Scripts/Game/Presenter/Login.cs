@@ -39,7 +39,7 @@ namespace Presenters
             var observable = account.GetObservable("");
             observable.Subscribe(x =>
             {
-                var data = x.Value<AccountData>();
+                var data = x.RefValue<AccountData>();
                 state.Set("name", data.nickName);
             });
             var serverListInfo = new Framework.LIST_INFO()

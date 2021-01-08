@@ -30,11 +30,6 @@ namespace MVP.Framework
             state.Set(path, value);
         }
 
-        public T Get<T>(string path)
-        {
-            return state.Get<T>(path);
-        }
-
         public Any Get(string path)
         {
             return state.Get(path);

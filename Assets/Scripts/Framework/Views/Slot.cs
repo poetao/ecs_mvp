@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using MVP.Framework.Core.Reflections;
+using MVP.Framework.Core.States;
 
 namespace MVP.Framework.Views
 {
@@ -101,18 +102,18 @@ namespace MVP.Framework.Views
             // @todo add more compoents support
         }
 
-        private static bool ProcessInputField(GameObject target, Action<object[]> action, object[] parameters, float throttle)
+        private static bool ProcessInputField(GameObject target, Action<Any[]> action, Any[] parameters, float throttle)
         {
             var inputField = target.GetComponent<InputField>();
             if (inputField == null) return false;
 
 	         inputField.OnValueChangedAsObservable().ThrottleFirst(TimeSpan.FromSeconds(throttle))
-                 .Subscribe((x) => action(new object[] {x})).AddTo(target);
+                 .Subscribe((x) => action(new Any[] {Any.Create(x)})).AddTo(target);
 
             return true;
         }
 
-        private static bool ProcessButton(GameObject target, Action<object[]> action, object[] parameters, float throttle)
+        private static bool ProcessButton(GameObject target, Action<Any[]> action, Any[] parameters, float throttle)
         {
             var button = target.GetComponent<Button>();
             if (button == null) return false;

@@ -6,7 +6,7 @@ using MVP.Framework.Features;
 namespace Features
 {
     [Serializable]
-    public struct BANK_INFO
+    public class BANK_INFO
     {
         public ulong money;
         public ulong coin;

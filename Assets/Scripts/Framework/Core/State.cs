@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UniRx;
 using MVP.Framework.Core.States;
+using UnityEngine.Animations;
 
 namespace MVP.Framework.Core
 {
@@ -26,24 +27,22 @@ namespace MVP.Framework.Core
 
         public void Set<T>(string path, T value, bool forceNotify = false)
         {
-            Set(path, new Any(value), forceNotify);
+            Set(path, Any.Create(value), forceNotify);
         }
 
         public void Set(string path, Any value, bool forceNotify = false)
         {
             var old = this.Map.ContainsKey(path) ? this.Map[path] : Any.Empty;
-            this.Map[path] = value;
-            if (forceNotify || value != old) this.Notify(path, value);
-        }
+            if (old == value) return;
 
-        public T Get<T>(string path)
-        {
-            return Get(path).Value<T>();
+            this.Map[path] = value;
+            if (forceNotify || !old.Equals(value)) this.Notify(path, value);
+            Any.Release(old);
         }
 
         public Any Get(string path)
         {
-            return this.Map.ContainsKey(path) ? this.Map[path] : default(Any);
+            return this.Map.ContainsKey(path) ? this.Map[path] : Any.Empty;
         }
 
         public IObservable<Any> GetObservable(string path)
