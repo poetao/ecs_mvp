@@ -530,10 +530,13 @@ MonoBehaviour:
   presenterRef: 
   linkItems: []
   slotItems: []
-  inspectorItems:
+  parameterItems:
   - name: text
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -542,6 +545,9 @@ MonoBehaviour:
   - name: btnClose
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -550,6 +556,9 @@ MonoBehaviour:
   - name: btnTest
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -573,11 +582,14 @@ MonoBehaviour:
   presenterRef: 
   linkItems: []
   slotItems: []
-  inspectorItems:
+  parameterItems:
   - name: animation
     parameter:
       intValue: 0
-      boolValue: 1
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
+      boolValue: 0
       stringValue: 
       floatValue: 0
       useFlag: B

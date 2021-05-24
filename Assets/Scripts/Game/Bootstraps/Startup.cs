@@ -21,6 +21,7 @@ namespace Bootstraps
 
         public string Setup()
         {
+            RegisterAction.Init();
             EnableDebug(false);
             SetupManager();
 

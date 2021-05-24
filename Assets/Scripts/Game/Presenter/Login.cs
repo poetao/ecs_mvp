@@ -39,7 +39,7 @@ namespace Presenters
             var observable = account.GetObservable("");
             observable.Subscribe(x =>
             {
-                var data = x.RefValue<AccountData>();
+                var data = x.RefOf<AccountData>();
                 state.Set("name", data.nickName);
             });
             var serverListInfo = new Framework.LIST_INFO()
@@ -61,7 +61,7 @@ namespace Presenters
             serverItem.SetData(info as ServerItemInfo);
         }
 
-        private void DoLogin()
+        private void DoLogin(int value, float aa)
         {
             if (account.IsLogin()) account.Logout();
 

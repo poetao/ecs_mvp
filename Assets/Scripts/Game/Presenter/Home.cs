@@ -27,7 +27,7 @@ namespace Presenters
 		private void Subscrible()
 		{
 			user.GetObservable("bank")
-				.Select(x => x.RefValue<BANK_INFO>())
+				.Select(x => x.ValueOf<BANK_INFO>())
 				.Subscribe(x =>
 			{
 				state.Set("coin", x.coin);

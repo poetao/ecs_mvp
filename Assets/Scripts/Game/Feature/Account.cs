@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using MVP.Framework;
+using MVP.Framework.Core;
 using MVP.Framework.Core.States;
 using MVP.Framework.Features;
 
 namespace Features
 {
     [Serializable]
-    public class AccountData
+    public class AccountData : State
     {
-        public string         nickName;
-        public Int64          id;
+        [StateField] public string         nickName;
+        [StateField] public Int64          id;
     }
 
     public class Account : Feature
@@ -25,10 +26,10 @@ namespace Features
 
         public void LocalLogin(AccountData data)
         {
-            var dictionary = new Dictionary<string, Any>() {
-                {"Account", Any.Create(data) },
-                {"User", Any.Create("") },
-                {"Game", Any.Create("") },
+            var dictionary = new Dictionary<string, State>() {
+                {"Account", data }, 
+                {"User", new UserData() },
+                {"Game", new State() },
             };
             OnLogin(dictionary);
         }
@@ -41,10 +42,10 @@ namespace Features
 
         public bool IsLogin()
         {
-            return state.Get("isLogin").BoolValue();
+            return state.Get<bool>("isLogin");
         }
 
-        public void OnLogin(Dictionary<string, Any> data)
+        public void OnLogin(Dictionary<string, State> data)
         {
             foreach (var info in data)
             {

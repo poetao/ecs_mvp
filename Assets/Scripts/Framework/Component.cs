@@ -55,7 +55,7 @@ namespace MVP.Framework
 
         private void BuildInspectors(Context context)
         {
-            foreach (var inspectorItem in context.proxy.inspectorItems)
+            foreach (var inspectorItem in context.proxy.parameterItems)
             {
                 var name      = inspectorItem.name;
                 var param     = inspectorItem.parameter;

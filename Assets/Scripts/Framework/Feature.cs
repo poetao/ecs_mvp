@@ -28,12 +28,12 @@ namespace MVP.Framework
             disposables.Dispose();
         }
 
-        public Any Get(string path = "")
+        public T Get<T>(string path = "") where T : IEquatable<T>
         {
-            return state.Get(path);
+            return state.Get<T>(path);
         }
 
-        public IObservable<Any> GetObservable(string path = "")
+        public IObservable<WrapBase> GetObservable(string path = "")
         {
             return state.GetObservable(path);
         }

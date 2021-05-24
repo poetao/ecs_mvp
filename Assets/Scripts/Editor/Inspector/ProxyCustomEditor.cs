@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using MVP.Framework.Views;
-using MVP.Framework.Core.Reflections;
 
 namespace MVP.Editors.Inspector
 {
@@ -23,8 +23,9 @@ namespace MVP.Editors.Inspector
 			InspectorBaseInfo(proxy.gameObject, proxy.assembly);
 
 			var viewType = GetViewScriptType(proxy.path, proxy.isComponent, proxy.assembly);
+			var presenterType = GetPresenterScriptType(proxy.path, proxy.presenterRef);
 			InspectorLinkExports(viewType);
-			InspectorSlotExports(viewType);
+			InspectorSlotExports(viewType, presenterType);
 			InspectorCompExports(viewType);
 
 			EditorGUILayout.Space();
@@ -138,11 +139,11 @@ namespace MVP.Editors.Inspector
 			return components[newSelectedIdx];
 		}
 
-		private void InspectorSlotExports(Type type)
+		private void InspectorSlotExports(Type viewType, Type presenterType)
 		{
-			if (type == null) return;
+			if (viewType == null) return;
 
-			var attributes = type.GetCustomAttributes(typeof(SlotAttribute), false).OfType<SlotAttribute>().ToArray();
+			var attributes = viewType.GetCustomAttributes(typeof(SlotAttribute), false).OfType<SlotAttribute>().ToArray();
 			var length = attributes.Count();
 			if (length <= 0) return;
 			
@@ -160,16 +161,44 @@ namespace MVP.Editors.Inspector
 					var slotItemGameObject = slotItem.FindPropertyRelative("gameObject");
 					EditorGUILayout.PropertyField(slotItemGameObject, new GUIContent(slotItemName.stringValue));
 
-					var throttle = slotItem.FindPropertyRelative("throttle");
-					EditorGUI.indentLevel++;
-					EditorGUILayout.PropertyField(throttle, new GUIContent("Throttle Time"));
-					EditorGUI.indentLevel--;
-
 					var parameters = slotItem.FindPropertyRelative("parameters");
-					InspectorSlotPramaters(parameters, attributes[i].parameters);
+					InspectorSlotPramaters(presenterType, parameters, attributes[i]);
+
+					EditorGUI.indentLevel++;
+					var throttle = slotItem.FindPropertyRelative("throttle");
+					var useThrottle = Mathf.Abs(throttle.floatValue - 0) > float.Epsilon;
+					var newUseThrottle = EditorGUILayout.Toggle("throttle", useThrottle);
+					if (newUseThrottle != useThrottle)
+					{
+						throttle.floatValue = newUseThrottle ? 1.0f : 0f;
+					}
+					if (newUseThrottle)
+					{
+						EditorGUILayout.PropertyField(throttle, new GUIContent("Throttle Time"));
+					}
+					EditorGUI.indentLevel--;
 				}
 				EditorGUI.indentLevel--;
 			}
+		}
+
+		private void InspectorSlotPramaters(Type presenterType, SerializedProperty properties, SlotAttribute attribute)
+		{
+			if (presenterType == null) return;
+
+            var flag = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+			var method = presenterType.GetMethod(attribute.name, flag);
+			var parameters = method.GetParameters();
+			properties.arraySize = parameters.Length;
+
+			EditorGUI.indentLevel++;
+			for (int i = 0; i < properties.arraySize; ++i)
+			{
+				var parameter = parameters[i];
+				var property = properties.GetArrayElementAtIndex(i);
+				InspectorCustomeParameter(property, parameter.ParameterType, parameter.Name);
+			}
+			EditorGUI.indentLevel--;
 		}
 
 		private void InspectorCompExports(Type type)
@@ -181,8 +210,8 @@ namespace MVP.Editors.Inspector
 				select field;
 			if (!fields.Any()) return;
 
-			var inspectorItems = this.serializedObject.FindProperty("inspectorItems");
-			inspectorItems.arraySize = fields.Count();
+			var parameterItems = this.serializedObject.FindProperty("parameterItems");
+			parameterItems.arraySize = fields.Count();
 			foldoutCompItems = EditorGUILayout.Foldout(foldoutCompItems, "Comp Items");
 			if (foldoutCompItems)
 			{
@@ -190,60 +219,53 @@ namespace MVP.Editors.Inspector
 				foreach (var field in fields)
 				{
 					EditorGUI.indentLevel++;
-					var inspectorItem = inspectorItems.GetArrayElementAtIndex(i);
-					var name = inspectorItem.FindPropertyRelative("name");
+					var parameterItem = parameterItems.GetArrayElementAtIndex(i);
+					var name = parameterItem.FindPropertyRelative("name");
 					name.stringValue = field.Name;
-					var parameter = inspectorItem.FindPropertyRelative("parameter");
-					InsepectorProxyParamenter(parameter, new ProxyParameter(field.FieldType), name.stringValue);
+					var parameter = parameterItem.FindPropertyRelative("parameter");
+					InspectorCustomeParameter(parameter, field.FieldType, name.stringValue);
 					EditorGUI.indentLevel--;
 					++i;
 				}
 			}
 		}
 
-		private void InspectorSlotPramaters(SerializedProperty properties, ProxyParameter[] parameters)
+		private void InspectorCustomeParameter(SerializedProperty property, Type type, string name)
 		{
-			EditorGUI.indentLevel++;
-			properties.arraySize = parameters.Length;
-			for (int i = 0; i < properties.arraySize; ++i)
-			{
-				var parameter = parameters[i];
-				var property = properties.GetArrayElementAtIndex(i);
-				InsepectorProxyParamenter(property, parameter);
-			}
+			if (property == null || type == null) return;
 
-			EditorGUI.indentLevel--;
-		}
-
-		private void InsepectorProxyParamenter(SerializedProperty property, ProxyParameter parameter, string name = null)
-		{
-			if (property == null || parameter == null) return;
-
-			var intProperty = property.FindPropertyRelative("intValue");
-			var boolProperty = property.FindPropertyRelative("boolValue");
-			var stringProperty = property.FindPropertyRelative("stringValue");
-			var floatProperty = property.FindPropertyRelative("floatValue");
-			var gameObjectProperty = property.FindPropertyRelative("gameObject");
 			var useFlagProperty = property.FindPropertyRelative("useFlag");
-			useFlagProperty.stringValue = parameter.useFlag;
-			switch (parameter.useFlag)
+			useFlagProperty.stringValue = InspectorParameter.CastFlag(type);
+
+			var label = $"{name} [{type}]";
+			if (type == typeof(int))
 			{
-				case "I":
-					EditorGUILayout.PropertyField(intProperty, new GUIContent(name ?? "int"));
-					break;
-				case "B":
-					EditorGUILayout.PropertyField(boolProperty, new GUIContent(name ?? "bool"));
-					break;
-				case "F":
-					EditorGUILayout.PropertyField(floatProperty, new GUIContent(name ?? "float"));
-					break;
-				case "S":
-					EditorGUILayout.PropertyField(stringProperty, new GUIContent(name ?? "string"));
-					break;
-				case "O":
-					EditorGUILayout.PropertyField(gameObjectProperty, new GUIContent(name ?? "Game Object"));
-					break;
-				default: break;
+				var intProperty = property.FindPropertyRelative("intValue");
+				EditorGUILayout.PropertyField(intProperty, new GUIContent(label));
+			}
+			else if (type == typeof(bool))
+			{
+				var boolProperty = property.FindPropertyRelative("boolValue");
+				EditorGUILayout.PropertyField(boolProperty, new GUIContent(label));
+			}
+			else if (type == typeof(float))
+			{
+				var floatProperty = property.FindPropertyRelative("floatValue");
+				EditorGUILayout.PropertyField(floatProperty, new GUIContent(label));
+			}
+			else if (type == typeof(string))
+			{
+				var stringProperty = property.FindPropertyRelative("stringValue");
+				EditorGUILayout.PropertyField(stringProperty, new GUIContent(label));
+			}
+			else if(type == typeof(GameObject))
+			{
+				var gameObjectProperty = property.FindPropertyRelative("gameObject");
+				EditorGUILayout.PropertyField(gameObjectProperty, new GUIContent(label));
+			}
+			else
+			{
+				Framework.Core.Log.Editor.E("Undefined InspectorParameter Type: {0}", type);
 			}
 		}
 
@@ -251,10 +273,22 @@ namespace MVP.Editors.Inspector
 		{
 			if (string.IsNullOrEmpty(path)) return null;
 
-			var type = isComponent ? Framework.Resource.TYPE.Component : Framework.Resource.TYPE.View;
 			if (Framework.Core.Path.instance == null) Framework.Core.Path.Setup();
+			var type = isComponent ? Framework.Resource.TYPE.Component : Framework.Resource.TYPE.View;
 			path = Framework.Core.Path.instance.Resolve(path, type, assembly);
 			return Framework.Core.Reflection.GetRuntimeType(path, isComponent ? assembly : "Game");
+		}
+
+		private Type GetPresenterScriptType(string path, string refPath)
+		{
+			if (string.IsNullOrEmpty(path)) return null;
+
+			if (Framework.Core.Path.instance == null) Framework.Core.Path.Setup();
+			var subPath = string.IsNullOrEmpty(refPath) ? "" : $"/{refPath}";
+			var presenterPath = $"{path}{subPath}";
+			var type = Framework.Resource.TYPE.Presenter;
+			path = Framework.Core.Path.instance.Resolve(presenterPath, type, "Game");
+			return Framework.Core.Reflection.GetRuntimeType(path, "Game");
 		}
 
 		private void BuildComponentScript(GameObject node, string relatePath, string assembly)
@@ -298,4 +332,3 @@ namespace MVP.Editors.Inspector
 		}
 	}
 }
-

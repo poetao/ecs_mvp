@@ -1,5 +1,4 @@
 using System;
-using MVP.Framework.Core;
 using MVP.Framework.Core.States;
 
 namespace MVP.Framework
@@ -25,14 +24,9 @@ namespace MVP.Framework
             state.Set(path, value);
         }
 
-        public void Set(string path, Any value)
+        public T Get<T>(string path)
         {
-            state.Set(path, value);
-        }
-
-        public Any Get(string path)
-        {
-            return state.Get(path);
+            return state.Get<T>(path);
         }
 
         public Reference Reference(string path)
@@ -40,7 +34,7 @@ namespace MVP.Framework
             return new Reference(state, path);
         }
 
-        public IObservable<Any> GetObservable(string path)
+        public IObservable<WrapBase> GetObservable(string path)
         {
             return state.GetObservable(path);
         }

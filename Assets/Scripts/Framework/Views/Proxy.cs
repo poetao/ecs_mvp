@@ -22,14 +22,14 @@ namespace MVP.Framework.Views
         public string name;
         public GameObject gameObject;
         public float throttle;
-        public List<ProxyParameter> parameters;
+        public List<InspectorParameter> parameters;
     }
 
     [Serializable]
-    public class ProxyInspectorItem
+    public class ProxyParameterItem
     {
         public string name;
-        public ProxyParameter parameter;
+        public InspectorParameter parameter;
     }
 
     public class Proxy : MonoBehaviour
@@ -40,7 +40,7 @@ namespace MVP.Framework.Views
         public string                   presenterRef;
         public List<ProxyLinkItem>      linkItems;
         public List<ProxySlotItem>      slotItems;
-        public List<ProxyInspectorItem> inspectorItems;
+        public List<ProxyParameterItem> parameterItems;
 
         private void Awake()
         {

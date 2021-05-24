@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using MVP.Framework.Core.Reflections;
 using MVP.Framework.Core.States;
+using MVP.Framework.Views;
 
 namespace MVP.Framework.Core
 {
@@ -30,10 +31,22 @@ namespace MVP.Framework.Core
 	        return assembly.GetType(path);
 	    }
 
+        public static MethodInfo GetMethod<T>(string methodName, BindingFlags flag)
+        {
+            if (methodName == null) return null;
+            return typeof(T).GetMethod(methodName, flag);
+        }
+
         public static MethodInfo GetMethod(object instance, string methodName, BindingFlags flag) 
         {
             if (methodName == null) return null;
             return instance.GetType().GetMethod(methodName, flag);
+        }
+
+        public static MethodInfo GetMethod<T>(string methodName)
+        {
+            var flag = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
+            return GetMethod<T>(methodName, flag);
         }
 
         public static MethodInfo GetMethod(object instance, string methodName)
@@ -285,29 +298,6 @@ namespace MVP.Framework.Core
             }
 
             return instance;
-        }
-
-        public static Func<Any[], Any> GetMethodDelegate<T>(string name, T o)
-        {
-            var method = GetMethod(o, name);
-	        if (method == null) return null;
-
-            return MethodDelegateBuilder.GetMethodDelegate(method, o);
-        }
-
-        public static Action<Any[]> GetMethodActionDelegate<T>(string name, T o)
-        {
-            var method = GetMethod(o, name);
-	        if (method == null) return null;
-
-            return MethodDelegateBuilder.GetMethodActionDelegate(method, o);
-        }
-
-        public static Any[] GetParemeters(ProxyParameter[] proxyParameters)
-        {
-            var parameters = (from proxyParmeter in proxyParameters
-                select proxyParmeter.GetAnyValue()).ToArray();
-            return parameters;
         }
     }
 }

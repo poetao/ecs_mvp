@@ -144,10 +144,13 @@ MonoBehaviour:
   presenterRef: 
   linkItems: []
   slotItems: []
-  inspectorItems:
+  parameterItems:
   - name: content
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -156,6 +159,9 @@ MonoBehaviour:
   - name: barrier
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -164,6 +170,9 @@ MonoBehaviour:
   - name: animation
     parameter:
       intValue: 0
+      uintValue: 0
+      longValue: 0
+      ulongValue: 0
       boolValue: 0
       stringValue: 
       floatValue: 0
@@ -229,11 +238,10 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-    m_TypeName: UnityEngine.UI.MaskableGraphic+CullStateChangedEvent, UnityEngine.UI,
-      Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
   m_Sprite: {fileID: 0}
   m_Type: 0
   m_PreserveAspect: 0

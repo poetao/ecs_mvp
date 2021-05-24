@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using MVP.Framework;
 using MVP.Framework.Core;
 using MVP.Framework.Resources;
+using UnityEditorInternal.VersionControl;
 
 namespace Presenters.Framework
 {
 	using Context = MVP.Framework.Presenters.Context;
 	using Builder = MVP.Framework.Bootstraps.Components.Context;
 
-	public class LIST_INFO
+	public class LIST_INFO : IEquatable<LIST_INFO>
 	{
 		public IEnumerable<object> list;
 		public Action<Presenter, object> action;
+
+		public bool Equals(LIST_INFO other)
+		{
+			return other == this;
+		}
 	}
 
     public class List : Presenter, ILinkDataManager

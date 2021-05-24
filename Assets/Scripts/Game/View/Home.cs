@@ -4,14 +4,14 @@ using MVP.Framework.Views;
 namespace Views
 {
     [Link("Coin")]
-    [Link("Gold")]
+    [Link("Diamon")]
 
     [Slot("DoBack")]
-    [Slot("DoPlay", new object[] {1})]
+    [Slot("DoPlay")]
 
     public class Home : View
     {
         public string Coin(ulong coin) { return $"C: {coin}"; }
-        public string Gold(ulong gold) { return $"G: {gold}"; }
+        public string Diamon(ulong money) { return $"G: {money}"; }
     }
 }

@@ -12,10 +12,12 @@ namespace Components.Framework
     public class List : MVP.Framework.Component
     {
         [MVP.Framework.Views.Inspector]
-        public GameObject     cellPrefab;
+        public GameObject     CellPrefab;
+
         [MVP.Framework.Views.Inspector]
-        public string         cellPath;
-        public CELL_LIST      list; 
+        public string         CellPath;
+
+        private CELL_LIST     list; 
 
         public override void Create(Context context)
         {
@@ -39,7 +41,7 @@ namespace Components.Framework
         private void Subscribe()
         {
             context.state.GetObservable("data")
-                .Select(x => x.RefValue<LIST_INFO>())
+                .Select(x => x.RefOf<LIST_INFO>())
                 .Subscribe(x =>
             {
                 UpdateList(x);
@@ -70,9 +72,9 @@ namespace Components.Framework
                 return list[index];
             }
 
-            var cellPrefabRef = new AssetRef(cellPath, cellPrefab);
+            var cellPrefabRef = new AssetRef(CellPath, CellPrefab);
             var presenter = context.presenter as Presenters.Framework.List;
-            var data = presenter.Build(cellPrefabRef, cellPath);
+            var data = presenter.Build(cellPrefabRef, CellPath);
             data.node.transform.SetParent(context.gameObject.transform);
             list.Add(index, data);
             return data;

@@ -7,95 +7,112 @@ using UnityEngine.Animations;
 
 namespace MVP.Framework.Core
 {
+    [AttributeUsage(AttributeTargets.Field)]
+    public class StateFieldAttribute : Attribute
+    {
+        public string path;
+
+        public StateFieldAttribute(string path = "")
+        {
+            this.path = path;
+        }
+    }
+
     [Serializable]
     public class State : IState
     {
-        private IDictionary<string, Any> Map = new Dictionary<string, Any>();
-        private IDictionary<string, ISubject<Any>> SubjectMap = new Dictionary<string, ISubject<Any>>();
+        private IDictionary<string, WrapBase> dataSet = new Dictionary<string, WrapBase>();
+        private IDictionary<string, ISubject<WrapBase>> subjectMap = new Dictionary<string, ISubject<WrapBase>>();
 
-        public void Default(string path, Any value)
+        public IObservable<WrapBase> GetObservable(string path)
         {
-            if (Map.ContainsKey(path)) return;
-            Set(path, value);
+            if (!subjectMap.ContainsKey(path))
+            {
+                subjectMap[path] = new Subject<WrapBase>();
+            }
+
+            return subjectMap[path];
         }
 
-        public void Default<T>(string path, T value)
+        public T Get<T>(string name)
         {
-            if (Map.ContainsKey(path)) return;
-            Set(path, value);
+            if (dataSet.TryGetValue(name, out var value))
+            {
+                return (value as Wrap<T>).Value;
+            }
+
+            return default(T);
         }
 
-        public void Set<T>(string path, T value, bool forceNotify = false)
+        public void Set<T>(string name, T value)
         {
-            Set(path, Any.Create(value), forceNotify);
+            Wrap<T> wrap;
+            if (dataSet.TryGetValue(name, out var existValue))
+            {
+                wrap = existValue as Wrap<T>;
+                if (wrap.Value.Equals(value)) return;
+            }
+            else
+            {
+                wrap = WrapPool<T>.Rent();
+                dataSet.Add(name, wrap);
+            }
+
+            wrap.Value = value;
+            Notify(name, wrap);
         }
 
-        public void Set(string path, Any value, bool forceNotify = false)
+        private void Notify(string name, WrapBase wrap)
         {
-            var old = this.Map.ContainsKey(path) ? this.Map[path] : Any.Empty;
-            if (old == value) return;
+            if (!subjectMap.ContainsKey(name))
+            {
+                subjectMap[name] = new Subject<WrapBase>();
+            }
 
-            this.Map[path] = value;
-            if (forceNotify || !old.Equals(value)) this.Notify(path, value);
-            Any.Release(old);
+            subjectMap[name].OnNext(wrap);
         }
 
-        public Any Get(string path)
+        public IDisposable Subscribe(string path, IObserver<WrapBase> observer)
         {
-            return this.Map.ContainsKey(path) ? this.Map[path] : Any.Empty;
-        }
-
-        public IObservable<Any> GetObservable(string path)
-        {
-            if (!this.SubjectMap.ContainsKey(path)) this.SubjectMap[path] = new Subject<Any>();
-            return this.SubjectMap[path];
-        }
-
-        public IDisposable Subscribe(string path, IObserver<Any> observer)
-        {
-            var subject = GetObservable(path) as Subject<Any>;
+            var subject = GetObservable(path) as Subject<WrapBase>;
             var disposable = subject.Subscribe(observer);
-            if (this.Map.ContainsKey(path)) subject.OnNext(this.Map[path]);
+            if (dataSet.ContainsKey(path))
+            {
+                subject.OnNext(dataSet[path]);
+            }
+
             return disposable;
         }
 
         public bool Has(string path)
         {
-            return Map.ContainsKey(path);
-        }
-
-        public void Notify(string path, Any value)
-        {
-            if (!this.SubjectMap.ContainsKey(path)) this.SubjectMap[path] = new Subject<Any>();
-            this.SubjectMap[path].OnNext(value);
+            return dataSet.ContainsKey(path);
         }
 
         public void Notify()
         {
-            foreach (var keyValuePair in this.SubjectMap)
+            foreach (var keyValuePair in subjectMap)
             {
-                if (this.Map.ContainsKey(keyValuePair.Key))
-                    keyValuePair.Value.OnNext(this.Map[keyValuePair.Key]);
-                else
-                    keyValuePair.Value.OnNext(Any.Empty);
+                if (!dataSet.ContainsKey(keyValuePair.Key)) continue;
+                keyValuePair.Value.OnNext(dataSet[keyValuePair.Key]);
             }
         }
 
-        public object GetRaw()
+        public IDictionary<string, WrapBase> GetRaw()
         {
-            return this.Map;
+            return dataSet;
         }
 
-        public void Replace(IDictionary<string, Any> dictionary)
+        public void Replace(IDictionary<string, WrapBase> dictionary)
         {
-            this.Map = dictionary;
+            dataSet = dictionary;
         }
 
         private void Notify(string path, bool recursion = true)
         {
-            if (this.Map.ContainsKey(path))
+            if (dataSet.ContainsKey(path))
             {
-                Notify(path, this.Map[path]);
+                Notify(path, dataSet[path]);
             }
             if (!recursion) return;
 

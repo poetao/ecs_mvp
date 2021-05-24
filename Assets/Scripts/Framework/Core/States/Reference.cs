@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace MVP.Framework.Core.States
 {
@@ -14,43 +15,22 @@ namespace MVP.Framework.Core.States
             this.path  = path;
         }
 
-        public void Default(string path, Any value)
+        public void Set<T>(string path, T value)
         {
-            var castPath = map(path);
-            if (state.Has(castPath)) return;
-
-            this.state.Set(castPath, value);
+            this.state.Set(map(path), value);
         }
 
-        public void Default<T>(string path, T value)
+        public T Get<T>(string path)
         {
-            var castPath = map(path);
-            if (state.Has(castPath)) return;
-
-            this.state.Set(castPath, value);
+            return this.state.Get<T>(map(path));
         }
 
-        public void Set(string path, Any value, bool forceNotify = false)
-        {
-            this.state.Set(map(path), value, forceNotify);
-        }
-
-        public void Set<T>(string path, T value, bool forceNotify = false)
-        {
-            this.state.Set(map(path), value, forceNotify);
-        }
-
-        public Any Get(string path)
-        {
-            return this.state.Get(map(path));
-        }
-
-        public IObservable<Any> GetObservable(string path)
+        public IObservable<WrapBase> GetObservable(string path)
         {
             return this.state.GetObservable(map(path));
         }
 
-        public IDisposable Subscribe(string path, IObserver<Any> observer)
+        public IDisposable Subscribe(string path, IObserver<WrapBase> observer)
         {
             return this.state.Subscribe(map(path), observer);
         }
@@ -66,7 +46,7 @@ namespace MVP.Framework.Core.States
             return $"{this.path}.{path}";
         }
 
-        public object GetRaw()
+        public IDictionary<string, WrapBase> GetRaw()
         {
             return state.GetRaw();
         }

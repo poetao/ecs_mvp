@@ -3,7 +3,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System.Linq;
-using MVP.Framework.Core;
 using MVP.Framework.Core.States;
 
 namespace MVP.Framework.Views
@@ -44,90 +43,88 @@ namespace MVP.Framework.Views
 	        }).AddTo(target);
         }
 
-        public static IObservable<Any> GetProperty(string name, View view, IState store)
+        public static IObservable<WrapBase> GetProperty(string name, View view, IState store)
         {
-	        var method = Reflection.GetMethod(view, name);
+	        var method = Core.Reflection.GetMethod(view, name);
 	        if (method == null) return null;
 
 	        var parameters = method.GetParameters();
 	        if (parameters.Length <= 0) return null;
 	        var properties = (from parameterInfo in parameters
-		        select store.GetObservable(parameterInfo.Name).Select(x => x)).ToArray();
+		        select store.GetObservable(parameterInfo.Name)).ToArray();
 
-            var action = Core.Reflection.GetMethodDelegate(name, view);
+            var action = Core.Reflections.MethodDelegateBuilder.GetDelegate(view, name);
             if (action == null) return null;
 
-	        // 这里不应该用CombineLates, CombineLatest是全部完成，应该用任意一个完成，暂时没找找现成的，要重写，这里用CombineLates测试
 	        var observable = Observable.CombineLatest(properties).Select(x =>
 	        {
-		        var args = x.ToArray();
-		        return action(args);
+		        return action(x.ToArray());
 	        });
 	        return observable;
         }
 
-        private static bool ProcessText(GameObject target, Any property)
+        private static bool ProcessText(GameObject target, WrapBase property)
         {
             var text = target.GetComponent<Text>();
             if (text == null) return false;
 
             if (property.Is<string>())
             {
-	            text.text = property.StringValue();
+	            text.text = property.RefOf<string>();
 		        return true;
 		    }
 
             if (property.IsValueType() && !property.Is<bool>())
             {
-	            text.text = property.ValueString();
+	            text.text = property.ValueToString();
 		        return true;
 		    }
 
             return false;
         }
 
-        private static bool ProcessButton(GameObject target, Any property)
+        private static bool ProcessButton(GameObject target, WrapBase property)
         {
             var button = target.GetComponent<Button>();
             if (button == null) return false;
 
             if (property.Is<bool>())
             {
-	            button.interactable = property.BoolValue();
+	            button.interactable = property.ValueOf<bool>();
 		        return true;
 		    }
 
             return false; 
         }
 
-        private static bool ProcessSlider(GameObject target, Any property)
+        private static bool ProcessSlider(GameObject target, WrapBase property)
         {
             var slider = target.GetComponent<Slider>();
             if (slider == null) return false;
 
             if (property.Is<bool>())
             {
-	            slider.interactable = property.BoolValue();
+	            slider.interactable = property.ValueOf<bool>();
 		        return true;
 		    }
 
             if (property.Is<float>())
             {
-	            slider.value = property.FloatValue();
+	            slider.value = property.ValueOf<float>();
 		        return true;
             }
 
             return false; 
         }
 
-	    private static bool ProcessAnimation(GameObject target, Any property)
+	    private static bool ProcessAnimation(GameObject target, WrapBase property)
         {
             var animation = target.GetComponent<Animation>();
             if (animation == null) return false;
 
             if (property.Is<string>())
             {
-	            var name = property.StringValue();
+	            var name = property.RefOf<string>();
 	            if (!string.IsNullOrEmpty(name)) animation.Play(name);
 				return true;
             }
@@ -135,14 +132,14 @@ namespace MVP.Framework.Views
 	        return false;
         }
 
-	    private static bool ProcessAnimator(GameObject target, Any property)
+	    private static bool ProcessAnimator(GameObject target, WrapBase property)
         {
             var animator = target.GetComponent<Animator>();
             if (animator == null) return false;
 
             if (property.Is<string>())
             {
-	            var name = property.StringValue();
+	            var name = property.RefOf<string>();
 	            if (!string.IsNullOrEmpty(name)) animator.SetTrigger(name);
 		        return true;
             }
@@ -150,11 +147,11 @@ namespace MVP.Framework.Views
 	        return false;
         }
 
-	    private static bool ProcessGameObject(GameObject target, Any property)
+	    private static bool ProcessGameObject(GameObject target, WrapBase property)
 	    {
             if (property.Is<bool>())
             {
-	            target.SetActive(property.BoolValue());
+	            target.SetActive(property.ValueOf<bool>());
 		        return true;
 		    }
 
