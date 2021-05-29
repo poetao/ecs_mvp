@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     public interface IState
     {

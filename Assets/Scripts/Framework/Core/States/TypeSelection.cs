@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     [Serializable]
     public class TypeSelection : ISerializationCallbackReceiver

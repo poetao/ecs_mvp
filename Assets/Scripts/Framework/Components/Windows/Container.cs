@@ -1,16 +1,15 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using MVP.Framework.Core;
-using MVP.Framework.Views;
-using UniRx.Triggers;
+using Framework.Core;
+using Framework.Views;
 
-namespace MVP.Framework.Components.Windows
+namespace Framework.Components.Windows
 {
     public interface ITrait
     {
         void Bind(Container container);
-        TraitContext Adjust(TraitContext context);
+        TraitContext Adjust(TraitContext traitContext);
     }
 
     public class TraitContext
@@ -22,31 +21,26 @@ namespace MVP.Framework.Components.Windows
 
     public class Container : Component
     {
-        [Inspector]
-        public GameObject   content;
-
-        [Inspector]
-        public GameObject   barrier;
-
-        [Inspector]
-        public GameObject   animation;
+        [Inspector] private readonly GameObject content = null;
+        [Inspector] private readonly GameObject barrier = null; 
+        [Inspector] private readonly GameObject animation = null;
 
         private LinkData    data;
         private ITrait      trait;
 
-        private static List<System.Type> traitPathList = new List<System.Type>
+        private static readonly List<Type> TraitPathList = new List<Type>
         {
             typeof(Dialog), typeof(Activity), typeof(Floater),
         };
 
-        public void Bind(object manager, LinkData data)
+        public void Bind(object manager, LinkData linkData)
         {
-            this.data                       = data;  
-            this.data.container             = this;
-            this.trait                      = GetTrait(data.node);
+            data                        = linkData;
+            data.container              = this;
+            trait                       = GetTrait(linkData.node);
 
-            this.trait.Bind(this);
-            this.data.node.transform.SetParent(content.transform, false);
+            trait.Bind(this);
+            data.node.transform.SetParent(content.transform, false);
 
             // @todo wait add more animtion effect when switch window
         }
@@ -63,7 +57,7 @@ namespace MVP.Framework.Components.Windows
 
         public void Destroy()
         {
-            GameObject.Destroy(context.gameObject);
+            UnityEngine.Object.Destroy(context.gameObject);
         }
 
         public void PlayAnimation(string name)
@@ -72,13 +66,13 @@ namespace MVP.Framework.Components.Windows
             animationComp.Play(name);
         }
 
-        public TraitContext Adjust(TraitContext context)
+        public TraitContext Adjust(TraitContext traitContext)
         {
-            var data = trait.Adjust(context);
-            barrier.SetActive(data.barrier);
-            this.context.gameObject.SetActive(context.visible);
-            context.visible = context.visible && !data.opaque;
-            return context;
+            var adjust= trait.Adjust(traitContext);
+            barrier.SetActive(adjust.barrier);
+            context.gameObject.SetActive(traitContext.visible);
+            traitContext.visible = traitContext.visible && !adjust.opaque;
+            return traitContext;
         }
 
         protected override void Dispose()
@@ -89,7 +83,7 @@ namespace MVP.Framework.Components.Windows
 
         private ITrait GetTrait(GameObject node)
         {
-            foreach (var type in traitPathList)
+            foreach (var type in TraitPathList)
             {
                 var component = GetPeer(node, type);
                 if (component != null) return component as ITrait;

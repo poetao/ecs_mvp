@@ -1,14 +1,14 @@
 using UnityEngine;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     public class TypeSelectionFilter : PropertyAttribute
     {
-        public string Category = "Default";
+        public readonly string Category;
 
         public TypeSelectionFilter(string category)
         {
-            this.Category = category;
+            Category = category;
         }
     }
 }

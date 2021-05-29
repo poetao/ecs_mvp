@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     public static class TypeUtil
     {

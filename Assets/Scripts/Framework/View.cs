@@ -1,9 +1,9 @@
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
-using MVP.Framework.Views;
+using Framework.Views;
 
-namespace MVP.Framework
+namespace Framework
 {
     public class View
     {

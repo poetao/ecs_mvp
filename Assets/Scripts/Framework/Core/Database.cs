@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UniRx;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     class DatabaseInfo<T>
     {
-        public string key { get; set; }
-        public T[] records { get; set; }
+        public string key { get; private set; }
+        public T[] records { get; private set; }
     }
 
     public class Database
@@ -68,13 +68,15 @@ namespace MVP.Framework.Core
         public T[] GetAll<T>(string name)
         {
             if (!tables.ContainsKey(name)) return null;
-            return (tables[name] as DatabaseInfo<T>).records;
+            return (tables[name] as DatabaseInfo<T>)?.records;
         }
 
         public T[] GetWithPredicate<T>(string name, Func<T, bool> predicate)
         {
             if (!tables.ContainsKey(name)) return null;
             var table = tables[name] as DatabaseInfo<T>;
+            if (table == null) return default(T[]);
+
             var records = from record in table.records
                           where predicate(record)
                           select record;
@@ -85,6 +87,8 @@ namespace MVP.Framework.Core
         {
             if (!tables.ContainsKey(name)) return 0;
             var table = tables[name] as DatabaseInfo<T>;
+            if (table == null) return 0;
+
             return table.records.Length;
         }
     }

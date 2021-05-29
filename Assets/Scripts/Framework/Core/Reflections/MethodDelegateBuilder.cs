@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using MVP.Framework.Core.States;
+using Framework.Core.States;
 
-namespace MVP.Framework.Core.Reflections
+namespace Framework.Core.Reflections
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class WrapDelegateAttribute : Attribute { }
@@ -55,7 +54,7 @@ namespace MVP.Framework.Core.Reflections
             var action = method.CreateDelegate(typeof(Action<TInstance>)) as Action<TInstance>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
-                action(o);
+                action?.Invoke(o);
                 return WrapBase.Empty;
             };
             actions.Add(key, proxy);
@@ -76,7 +75,12 @@ namespace MVP.Framework.Core.Reflections
             var action = method.CreateDelegate(typeof(Action<TInstance, T0>)) as Action<TInstance, T0>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
-                action(o, x[0].ValueOf<T0>());
+                if (x[0] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
+                action?.Invoke(o, x[0].ValueOf<T0>());
                 return WrapBase.Empty;
             };
             actions.Add(key, proxy);
@@ -97,7 +101,12 @@ namespace MVP.Framework.Core.Reflections
             var action = method.CreateDelegate(typeof(Action<TInstance, T0, T1>)) as Action<TInstance, T0, T1>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
-                action(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>());
+                if (x[0] == WrapBase.Empty || x[1] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
+                action?.Invoke(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>());
                 return WrapBase.Empty;
             };
             actions.Add(key, proxy);
@@ -118,7 +127,12 @@ namespace MVP.Framework.Core.Reflections
             var action = method.CreateDelegate(typeof(Action<TInstance, T0, T1>)) as Action<TInstance, T0, T1, T2>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
-                action(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>(), x[2].ValueOf<T2>());
+                if (x[0] == WrapBase.Empty || x[1] == WrapBase.Empty || x[2] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
+                action?.Invoke(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>(), x[2].ValueOf<T2>());
                 return WrapBase.Empty;
             };
             actions.Add(key, proxy);
@@ -139,7 +153,7 @@ namespace MVP.Framework.Core.Reflections
             var func = method.CreateDelegate(typeof(Func<TInstance, TReturn>)) as Func<TInstance, TReturn>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
-                return Wrap<TReturn>.Create(func(o));
+                return Wrap<TReturn>.Create(func != null ? func.Invoke(o) : default(TReturn));
             };
             actions.Add(key, proxy);
         }
@@ -159,6 +173,11 @@ namespace MVP.Framework.Core.Reflections
             var func = method.CreateDelegate(typeof(Func<TInstance, T0, TReturn>)) as Func<TInstance, T0, TReturn>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
+                if (func == null || x[0] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
                 return Wrap<TReturn>.Create(func(o, x[0].ValueOf<T0>()));
             };
             actions.Add(key, proxy);
@@ -179,6 +198,11 @@ namespace MVP.Framework.Core.Reflections
             var func = method.CreateDelegate(typeof(Func<TInstance, T0, T1, TReturn>)) as Func<TInstance, T0, T1, TReturn>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
+                if (func == null || x[0] == WrapBase.Empty || x[1] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
                 return Wrap<TReturn>.Create(func(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>()));
             };
             actions.Add(key, proxy);
@@ -199,6 +223,11 @@ namespace MVP.Framework.Core.Reflections
             var func = method.CreateDelegate(typeof(Func<TInstance, T0, T1, T2, TReturn>)) as Func<TInstance, T0, T1, T2, TReturn>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
+                if (func == null || x[0] == WrapBase.Empty || x[1] == WrapBase.Empty || x[2] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
                 return Wrap<TReturn>.Create(func(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>(), x[2].ValueOf<T2>()));
             };
             actions.Add(key, proxy);
@@ -219,6 +248,11 @@ namespace MVP.Framework.Core.Reflections
             var func = method.CreateDelegate(typeof(Func<TInstance, T0, T1, T2, T3, TReturn>)) as Func<TInstance, T0, T1, T2, T3, TReturn>;
             Func<TInstance, WrapBase[], WrapBase> proxy = (o, x) =>
             {
+                if (func == null || x[0] == WrapBase.Empty || x[1] == WrapBase.Empty || x[2] == WrapBase.Empty || x[3] == WrapBase.Empty)
+                {
+                    return WrapBase.Empty;
+                }
+
                 return Wrap<TReturn>.Create(func(o, x[0].ValueOf<T0>(), x[1].ValueOf<T1>(), x[2].ValueOf<T2>(), x[3].ValueOf<T3>()));
             };
             actions.Add(key, proxy);

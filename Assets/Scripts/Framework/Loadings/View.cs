@@ -1,7 +1,7 @@
 using System;
 using UniRx;
 
-namespace MVP.Framework.Loadings
+namespace Framework.Loadings
 {
     public interface IView
     {
@@ -12,10 +12,6 @@ namespace MVP.Framework.Loadings
 
     public class View : IView
     {
-        public View()
-        {
-        }
-
         public void Show()
         {
         }

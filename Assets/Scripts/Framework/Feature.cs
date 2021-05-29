@@ -1,13 +1,15 @@
 using System;
 using UniRx;
-using MVP.Framework.Core;
-using MVP.Framework.Core.States;
-using MVP.Framework.Features;
+using Framework.Core;
+using Framework.Core.States;
+using Framework.Features;
 
-namespace MVP.Framework
+namespace Framework
 {
     public abstract class Feature : IDisposable
     {
+        static private bool useAutoSave = false;
+
         protected Storage       storage;
         protected Store         store;
         protected IState        state;
@@ -20,7 +22,10 @@ namespace MVP.Framework
             this.state       = state;
             this.disposables = new CompositeDisposable();
 
-            this.state.GetObservable().Subscribe(x => AutoSave()).AddTo(disposables);
+            if (useAutoSave)
+            {
+                this.state.GetObservable().Subscribe(x => AutoSave()).AddTo(disposables);
+            }
         }
 
         public virtual void Dispose()
@@ -28,19 +33,22 @@ namespace MVP.Framework
             disposables.Dispose();
         }
 
-        public T Get<T>(string path = "") where T : IEquatable<T>
+        public IObservable<T> GetObservable<T>(string path = "")
         {
-            return state.Get<T>(path);
+            return GetObservable(path).Select(x =>
+            {
+                if (x == WrapBase.Empty)
+                {
+                    return default(T);
+                }
+
+                return x.ValueOf<T>();
+            });
         }
 
         public IObservable<WrapBase> GetObservable(string path = "")
         {
             return state.GetObservable(path);
-        }
-
-        public void Notify()
-        {
-            state.Notify();
         }
 
         protected virtual void AutoSave()

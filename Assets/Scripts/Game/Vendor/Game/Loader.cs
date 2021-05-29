@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UniRx;
-using MVP.Framework;
-using MVP.Framework.Core;
-using MVP.Framework.Resources;
+using Framework;
+using Framework.Core;
+using Framework.Resources;
 
-namespace Vendor.Game
+namespace Game.Vendor.Game
 {
     using ProgressDelegateSpawn = Func<ProgressInfo, ProgressDelegate>;
     using ASSET_DIC = Dictionary<string, AssetRef>;
@@ -47,13 +47,13 @@ namespace Vendor.Game
             {
                 var result = await LoadAssets(loading, resources);
                 return Tuple.Create("assets", result as object);
-            };
+            }
 
             async Task<Tuple<string, object>> LoadSceneFunc()
             {
                 var result = await Scene.instance.Load(this.name, BuildOption(loading));
                 return Tuple.Create("scene", result as object);
-            };
+            }
 
             var tasks = new List<IObservable<Tuple<string, object>>>();
             tasks.Add(ObservableTask.Create(LoadAssetsFunc()));
@@ -74,9 +74,9 @@ namespace Vendor.Game
         {
             async Task<Tuple<string, AssetRef>> LoadFunc(string path)
             {
-                var go = await MVP.Framework.Resource.instance.LoadAsync(path, BuildOption(loading));
+                var go = await Framework.Resource.instance.LoadAsync(path, BuildOption(loading));
                 return Tuple.Create(path, go);
-            };
+            }
 
             var tasks = new List<IObservable<Tuple<string, AssetRef>>>();
             tasks = resources.Aggregate(tasks, (data, it) =>
@@ -98,9 +98,12 @@ namespace Vendor.Game
         {
             Func<ILoader<object>, Task<object>> load = async (loader) => await Load(loader, resources);
             var loading = (await Scene.instance.Run("Loading", load)) as ILoader<object>;
-            var loaderAssets = await loading.Get() as Tuple<ASSET_DIC, AsyncOperation>;
-            this.assets = loaderAssets.Item1;
+            if (loading == null) return;
 
+            var loaderAssets = await loading.Get() as Tuple<ASSET_DIC, AsyncOperation>;
+            if (loaderAssets == null) return;
+
+            assets = loaderAssets.Item1;
             var data = new SceneData()
             {
                 name      = name,

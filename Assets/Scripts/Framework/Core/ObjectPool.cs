@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
 	public interface IAstarPooledObject {
 		void OnEnterPool ();

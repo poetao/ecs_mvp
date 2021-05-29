@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
-using MVP.Framework.Core;
+using Framework.Core;
 
-namespace Bootstraps
+namespace Game.Bootstraps
 {
-    public class Startup : MVP.Framework.IStartupContext
+    public class Startup : Framework.IStartupContext
     {
         [RuntimeInitializeOnLoadMethod]
         public static void Constructor()
         {
-            MVP.Framework.Bootstrap.Start(new Startup());
+            Framework.Bootstrap.Start(new Startup());
         }
         
         public Dictionary<string, string> GetModules()
@@ -34,7 +34,7 @@ namespace Bootstraps
 
         private void SetupManager()
         {
-            MVP.Framework.Features.Manager.instance.Create("Features.Account");
+            Framework.Features.Manager.instance.Create("Game.Features.Account");
         }
     }
 }

@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
-using UniRx.Triggers;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     public class WrapPool<T>
     {
@@ -106,11 +105,22 @@ namespace MVP.Framework.Core.States
             {
 #if UNITY_EDITOR
                 throw new InvalidCastException();
-#endif
+#else
                 return default(T1);
+#endif
             }
 
-            return (this as Wrap<T1>).Value;
+            var wrap = this as Wrap<T1>;
+            if (null == wrap)
+            {
+#if UNITY_EDITOR
+                throw new InvalidCastException();
+#else
+                return default(T1);
+#endif
+            }
+
+            return wrap.Value;
         }
 
         public override T1 RefOf<T1>()
@@ -119,8 +129,9 @@ namespace MVP.Framework.Core.States
             {
 #if UNITY_EDITOR
                 throw new InvalidCastException();
-#endif
+#else
                 return default(T1);
+#endif
             }
 
             return Value as T1;

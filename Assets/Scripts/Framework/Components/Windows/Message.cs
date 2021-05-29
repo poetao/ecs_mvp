@@ -1,20 +1,15 @@
 using UnityEngine;
 using UniRx;
 using UnityEngine.UI;
-using MVP.Framework.Views;
+using Framework.Views;
 
-namespace MVP.Framework.Components.Windows
+namespace Framework.Components.Windows
 {
     public class Message : Component
     {
-        [Inspector]
-        public GameObject text;
-
-        [Inspector]
-        public GameObject btnClose;
-
-        [Inspector]
-        public GameObject btnTest;
+        [Inspector] private readonly GameObject text = null;
+        [Inspector] private readonly GameObject btnClose = null;
+        [Inspector] private readonly GameObject btnTest = null;
 
         public override void Create(Context context)
         {
@@ -33,7 +28,7 @@ namespace MVP.Framework.Components.Windows
             btnTest.GetComponent<Button>().OnClickAsObservable()
                 .Subscribe(x =>
                 {
-                    Window.instance.Open("Framework/Windows/Toast");
+                    Window.instance.Open("Frameworks/Windows/Toast");
                 });
         }
 	}

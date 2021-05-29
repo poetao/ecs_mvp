@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UniRx;
 using UniRx.Triggers;
-using MVP.Framework.Views;
-using Context = MVP.Framework.Views.Context;
+using Framework.Views;
+using Context = Framework.Views.Context;
 
-namespace MVP.Framework
+namespace Framework
 {
     using WEAK_COMP_DIC     = Dictionary<int, Dictionary<Type, WeakReference<Component>>>;
 

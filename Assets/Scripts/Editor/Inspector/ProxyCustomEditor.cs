@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Framework.Core;
 using UnityEditor;
 using UnityEngine;
-using MVP.Framework.Views;
+using Framework.Views;
+using ASSEMBLY_TYPE = Framework.Core.Path.ASSEMBLY_TYPE;
 
-namespace MVP.Editors.Inspector
+namespace Editors.Inspector
 {
 	[CanEditMultipleObjects, CustomEditor(typeof(Proxy))]
 	public class ProxyCustomEditor : Editor
@@ -32,7 +34,7 @@ namespace MVP.Editors.Inspector
 			serializedObject.ApplyModifiedProperties();
 		}
 
-		private void InspectorBaseInfo(GameObject node, string assembly)
+		private void InspectorBaseInfo(GameObject node, ASSEMBLY_TYPE assembly)
 		{
 			var isComponent = InspectorType();
 			if (isComponent) InspectorAssemble();
@@ -49,7 +51,7 @@ namespace MVP.Editors.Inspector
 				}
 				else
 				{
-					BuildViewScript(node, path.stringValue);
+					BuildViewScript(node, path.stringValue, assembly);
 				}
 			}
 			EditorGUILayout.EndHorizontal();
@@ -85,11 +87,7 @@ namespace MVP.Editors.Inspector
 		{
 			EditorGUILayout.BeginHorizontal();
 			var assembleProperty = this.serializedObject.FindProperty("assembly");
-			var assemblies = new List<string> {"Framework", "Game"};
-			var selectedIdx = assemblies.IndexOf(assembleProperty.stringValue);
-			selectedIdx = selectedIdx == -1 ? assemblies.Count - 1 : selectedIdx;
-			var newSelectedIdx = EditorGUILayout.Popup("Assembly", selectedIdx, assemblies.ToArray());
-			assembleProperty.stringValue = assemblies[newSelectedIdx];
+			EditorGUILayout.PropertyField(assembleProperty);
 			EditorGUILayout.EndHorizontal();
 		}
 
@@ -205,7 +203,7 @@ namespace MVP.Editors.Inspector
 		{
 			if (type == null) return;
 
-			var fields = from field in type.GetFields()
+			var fields = from field in Reflection.GetFields(type)
 				where field.IsDefined(typeof(InspectorAttribute), false)
 				select field;
 			if (!fields.Any()) return;
@@ -237,7 +235,7 @@ namespace MVP.Editors.Inspector
 			var useFlagProperty = property.FindPropertyRelative("useFlag");
 			useFlagProperty.stringValue = InspectorParameter.CastFlag(type);
 
-			var label = $"{name} [{type}]";
+			var label = $"{name} [{type.ToString().Split('.').Last()}]";
 			if (type == typeof(int))
 			{
 				var intProperty = property.FindPropertyRelative("intValue");
@@ -269,14 +267,14 @@ namespace MVP.Editors.Inspector
 			}
 		}
 
-		private Type GetViewScriptType(string path, bool isComponent, string assembly)
+		private Type GetViewScriptType(string path, bool isComponent, ASSEMBLY_TYPE assembly)
 		{
 			if (string.IsNullOrEmpty(path)) return null;
 
 			if (Framework.Core.Path.instance == null) Framework.Core.Path.Setup();
 			var type = isComponent ? Framework.Resource.TYPE.Component : Framework.Resource.TYPE.View;
 			path = Framework.Core.Path.instance.Resolve(path, type, assembly);
-			return Framework.Core.Reflection.GetRuntimeType(path, isComponent ? assembly : "Game");
+			return Framework.Core.Reflection.GetRuntimeType(path, isComponent ? assembly : ASSEMBLY_TYPE.GAME);
 		}
 
 		private Type GetPresenterScriptType(string path, string refPath)
@@ -287,19 +285,19 @@ namespace MVP.Editors.Inspector
 			var subPath = string.IsNullOrEmpty(refPath) ? "" : $"/{refPath}";
 			var presenterPath = $"{path}{subPath}";
 			var type = Framework.Resource.TYPE.Presenter;
-			path = Framework.Core.Path.instance.Resolve(presenterPath, type, "Game");
-			return Framework.Core.Reflection.GetRuntimeType(path, "Game");
+			path = Framework.Core.Path.instance.Resolve(presenterPath, type);
+			return Framework.Core.Reflection.GetRuntimeType(path);
 		}
 
-		private void BuildComponentScript(GameObject node, string relatePath, string assembly)
+		private void BuildComponentScript(GameObject node, string relatePath, ASSEMBLY_TYPE assembly)
 		{
 			var path = ScriptAutoBuilder.GetComponentPath(relatePath, assembly);
 			ScriptAutoBuilder.BuildComponentScript(node, path, assembly);
 		}
 
-		private void BuildViewScript(GameObject node, string relatePath)
+		private void BuildViewScript(GameObject node, string relatePath, ASSEMBLY_TYPE assembly)
 		{
-			dynamic data = ScriptAutoBuilder.BuildViewScript(node, ScriptAutoBuilder.GetViewPath(relatePath));
+			dynamic data = ScriptAutoBuilder.BuildViewScript(node, ScriptAutoBuilder.GetViewPath(relatePath, assembly));
 			if (data == null) return;
 
 			var linkItems = this.serializedObject.FindProperty("linkItems");
@@ -325,7 +323,7 @@ namespace MVP.Editors.Inspector
 			}
 		}
 
-		private void BuildPresenterScript(GameObject node, string relatePath, string assembly)
+		private void BuildPresenterScript(GameObject node, string relatePath, ASSEMBLY_TYPE assembly)
 		{
 			var path = ScriptAutoBuilder.GetPresenterPath(relatePath, assembly);
 			ScriptAutoBuilder.BuildPresenterScript(node, path);

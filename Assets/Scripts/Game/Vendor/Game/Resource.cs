@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using MVP.Framework.Core;
+using Framework.Core;
 
-namespace Vendor.Game
+namespace Game.Vendor.Game
 {
     public class Resource
     {
@@ -14,9 +14,7 @@ namespace Vendor.Game
         {
             "Stages/Level2",
         };
-        public static List<string> Game = new List<string>
-        {
-        };
+        public static List<string> Game = new List<string>();
 
         public static List<string> Get(string name)
         {

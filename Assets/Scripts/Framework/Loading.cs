@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UniRx;
-using MVP.Framework.Core;
-using MVP.Framework.Loadings;
+using Framework.Core;
+using Framework.Loadings;
 
-namespace MVP.Framework
+namespace Framework
 {
     internal class LoadingTimeoutError : Exception {}
 
@@ -96,7 +96,10 @@ namespace MVP.Framework
             }
             catch (Exception e)
             {
-                if (!(e is LoadingTimeoutError)) throw e;
+                if (!(e is LoadingTimeoutError))
+                {
+                    throw new LoadingTimeoutError();
+                }
                 var retry = await Retry(time);
                 if (retry) return await RunInner(asynFunc);
                 return default(T);
@@ -119,7 +122,7 @@ namespace MVP.Framework
                 }
             };
 
-            return await Run<T>(WrapInner, option);
+            return await Run(WrapInner, option);
         }
 
         private void Show()

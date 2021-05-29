@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     public static class Processer
     {
@@ -40,7 +40,7 @@ namespace MVP.Framework.Core
                 
                 Process process = Process.Start(info);
 
-                if (waitExit)
+                if (waitExit && process != null)
                 {
                     process.WaitForExit();
                     if (process.ExitCode != 0)

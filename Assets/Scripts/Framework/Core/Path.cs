@@ -1,17 +1,24 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     using TYPE = Resource.TYPE;
 
     public class Path
     {
+        [Serializable]
+        public enum ASSEMBLY_TYPE
+        {
+            GAME, FRAMEWORK
+        }
+
         public static Path instance { get; private set; }
         public static string AssetBundleFolder = "AssetBundles";
 
-        private Dictionary<string, string> symboles;
-        private Dictionary<string, string> assemblies;
+        private readonly Dictionary<string, string> symboles;
+        private Dictionary<ASSEMBLY_TYPE, string> assemblies;
 
         public static void Setup()
         {
@@ -21,70 +28,88 @@ namespace MVP.Framework.Core
         private Path()
         {
             symboles   = new Dictionary<string, string>();
-            assemblies = new Dictionary<string, string>
+            assemblies = new Dictionary<ASSEMBLY_TYPE, string>
             {
-                {"Game", ""}, {"Framework", "MVP.Framework."}
+                {ASSEMBLY_TYPE.GAME, "Game"}, {ASSEMBLY_TYPE.FRAMEWORK, "Framework"}
             };
         }
 
-        public void Map(string symbole, string path)
+        public string GetAssemblyPath(ASSEMBLY_TYPE assembly)
         {
-            symboles.Remove(symbole);
-            if (string.IsNullOrEmpty(path)) return;
+            if (!assemblies.ContainsKey(assembly)) return "";
 
-            symboles.Add(symbole, path);
+            return assemblies[assembly];
         }
 
-        public string Resolve(string path, TYPE type, string assembly = null)
+        public void Map(string symbole, TYPE type, string path, ASSEMBLY_TYPE assembly)
         {
-            switch (type)
+            if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(symbole))
             {
-                case TYPE.Prefab:       path = ResolvePrefab(path, assembly);      break;
-                case TYPE.Scene:        path = ResolveScene(path, assembly);       break;
-                case TYPE.AssetBundle:  path = ResolveAssetBundle(path, assembly); break;
-                case TYPE.Presenter:    path = ResolvePresenter(path, assembly);   break;
-                case TYPE.View:         path = ResolveView(path, assembly);        break;
-                case TYPE.Component:    path = ResolveComponent(path, assembly);   break;
-                case TYPE.Storage:      path = ResolveStorage(path, assembly);     break;
-                default: break;
+                return;
             }
 
+            var key = $"{assembly}_{type}_{symbole}";
+            if (symboles.ContainsKey(key)) return;
+
+            symboles.Add(key, path);
+        }
+
+        public string Resolve(string symbole, TYPE type, ASSEMBLY_TYPE assembly = ASSEMBLY_TYPE.GAME)
+        {
+            var key = $"{assembly}_{type}_{symbole}";
+            if (symboles.TryGetValue(key, out var path))
+            {
+                return path;
+            }
+
+            switch (type)
+            {
+                case TYPE.Prefab:       path = ResolvePrefab(symbole);                break;
+                case TYPE.Scene:        path = ResolveScene(symbole);                 break;
+                case TYPE.AssetBundle:  path = ResolveAssetBundle(symbole);           break;
+                case TYPE.Presenter:    path = ResolvePresenter(symbole, assembly);   break;
+                case TYPE.View:         path = ResolveView(symbole, assembly);        break;
+                case TYPE.Component:    path = ResolveComponent(symbole, assembly);   break;
+                case TYPE.Storage:      path = ResolveStorage(symbole);               break;
+            }
+            Map(symbole, type, path, assembly);
+
             return path;
         }
 
-        private string ResolvePrefab(string path, string assembly)
+        private string ResolvePrefab(string path)
         {
-            var finalPath = $"Assets/Prefabs/{path.Replace('.', '/')}.prefab";
-            return finalPath.ToLower();
+            return $"Assets/Prefabs/{path.Replace('.', '/')}.prefab".ToLower();
         }
 
-        private string ResolveScene(string path, string assembly)
+        private string ResolveScene(string path)
         {
             return path;
         }
 
-        private string ResolveAssetBundle(string path, string assembly)
+        private string ResolveAssetBundle(string path)
         {
-            path = path.ToLower().Replace("assets/", "");
-            return $"assets/assetBundles/{path}.ab";
+            var finalPath = path.ToLower().Replace("assets/", "");
+            finalPath = $"assets/assetBundles/{finalPath}.ab";
+            return finalPath;
         }
 
-        private string ResolvePresenter(string path, string assembly)
+        private string ResolvePresenter(string path, ASSEMBLY_TYPE assembly)
         {
-            return "Presenters." + path.Replace("/", ".");
+            return GetAssemblyPath(assembly) + ".Presenters." + path.Replace("/", ".");
         }
 
-        private string ResolveView(string path, string assembly)
+        private string ResolveView(string path, ASSEMBLY_TYPE assembly)
         {
-            return "Views." + path.Replace("/", ".");
+            return GetAssemblyPath(assembly) + ".Views." + path.Replace("/", ".");
         }
 
-        private string ResolveComponent(string path, string assembly)
+        private string ResolveComponent(string path, ASSEMBLY_TYPE assembly)
         {
-            return GetAssemblyPath(assembly) + "Components." + path.Replace("/", ".");
+            return GetAssemblyPath(assembly) + ".Components." + path.Replace("/", ".");
         }
 
-        private string ResolveStorage(string path, string assembly)
+        private string ResolveStorage(string path)
         {
             var prePath = Application.persistentDataPath;
             if (Application.platform == RuntimePlatform.WindowsEditor)
@@ -93,14 +118,6 @@ namespace MVP.Framework.Core
             }
 
             return prePath + "/" + path.Replace(".", "/");
-        }
-
-        private string GetAssemblyPath(string assembly)
-        {
-            if (string.IsNullOrEmpty(assembly)) return "";
-            if (!assemblies.ContainsKey(assembly)) return "";
-
-            return assemblies[assembly];
         }
     }
 }

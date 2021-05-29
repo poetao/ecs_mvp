@@ -1,7 +1,7 @@
 using System;
-using MVP.Framework.Core.States;
+using Framework.Core.States;
 
-namespace MVP.Framework
+namespace Framework
 {
     public class Store
     {

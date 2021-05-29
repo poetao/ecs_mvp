@@ -1,8 +1,7 @@
 using System.IO;
-using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     public class Storage
     {
@@ -16,7 +15,13 @@ namespace MVP.Framework.Core
         public void SaveBySerialize(string path, object graph)
         {
             var fullPath = Path.instance.Resolve(path, Resource.TYPE.Storage);
-            var directory = System.IO.Path.GetDirectoryName(fullPath); 
+            var directory = System.IO.Path.GetDirectoryName(fullPath);
+            if (directory == null)
+            {
+                Log.Framework.E("Storage.SaveBySerialize({0}, {1}) fail for {2}", path, graph, fullPath);
+                return;
+            }
+
 			if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             BinaryFormatter bf = new BinaryFormatter();

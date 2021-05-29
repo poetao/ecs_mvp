@@ -1,7 +1,7 @@
 using System.Collections.Generic;
-using MVP.Framework.Core;
+using Framework.Core;
 
-namespace MVP.Framework.Bootstraps
+namespace Framework.Bootstraps
 {
     using LIST_PROXY = List<Views.Proxy>;
     using LIST_MONO  = List<Framework.Component>;
@@ -53,7 +53,7 @@ namespace MVP.Framework.Bootstraps
         private void CreateView(Presenter presenter, Views.Proxy proxy)
         {
             var path  = Path.instance.Resolve(proxy.path, Resource.TYPE.View);
-            var view  = Reflection.CreateInstance<View>(path, null);
+            var view  = Reflection.CreateInstance<View>(path);
             view.Create(ResolveContext(presenter, proxy));
         }
 

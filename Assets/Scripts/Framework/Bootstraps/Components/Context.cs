@@ -1,27 +1,27 @@
 using System;
 using System.Collections.Generic;
-using MVP.Framework.Core;
-using MVP.Framework.Core.States;
-using MVP.Framework.Features;
+using Framework.Core;
+using Framework.Core.States;
+using Framework.Features;
 
-namespace MVP.Framework.Bootstraps.Components
+namespace Framework.Bootstraps.Components
 {
     public class Context
     {
         public Presenter Build(string path, params object[] args)
         {
             path = Path.instance.Resolve(path, Resource.TYPE.Presenter);
-            var instance = Reflection.CreateInstance<Presenter>(path, null);
+            var instance = Reflection.CreateInstance<Presenter>(path);
             if (instance == null) return null;
 
             instance.Build(this, args);
             return instance;
         }
 
-        public LinkData                     Data { get; private set; }
+        public LinkData                             Data { get; }
 
-        private Dictionary<Type, object>    managers;
-        private IState                      state;
+        private readonly Dictionary<Type, object>   managers;
+        private IState                              state;
 
         public Context(LinkData data)
         {

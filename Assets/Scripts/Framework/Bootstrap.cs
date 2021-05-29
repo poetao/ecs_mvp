@@ -1,16 +1,16 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using MVP.Framework.Bootstraps;
+using Framework.Bootstraps;
 
-namespace MVP.Framework
+namespace Framework
 {
     public class Bootstrap : Object
     {
         public static async void Start(IStartupContext context)
         {
-            await SceneManager.LoadSceneAsync("BootStrap");
+            await SceneManager.LoadSceneAsync("Bootstrap");
             Bridge.Setup();
-            await Bridge.instance.Boot(context);
+            await Bridge.Instance.Boot(context);
         }
     }
 }

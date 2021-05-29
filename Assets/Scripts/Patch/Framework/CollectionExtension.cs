@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP.Extensions
+namespace Extensions
 {
     public static class Externs
     {

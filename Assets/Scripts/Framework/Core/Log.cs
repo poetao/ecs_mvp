@@ -1,6 +1,6 @@
-using MVP.Framework.Core.Logs;
+using Framework.Core.Logs;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     public static class Log
     {

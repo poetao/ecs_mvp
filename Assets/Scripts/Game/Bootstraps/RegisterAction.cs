@@ -1,6 +1,6 @@
-using MVP.Framework.Core.Reflections;
+using Framework.Core.Reflections;
 
-namespace Bootstraps
+namespace Game.Bootstraps
 {
     public static class RegisterAction
     {

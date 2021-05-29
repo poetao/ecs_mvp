@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using MVP.Framework.Core;
-using MVP.Framework.Core.States;
+using Framework.Core;
+using Framework.Core.States;
 
-namespace MVP.Framework.Views
+namespace Framework.Views
 {
     [Serializable]
     public class InspectorParameter

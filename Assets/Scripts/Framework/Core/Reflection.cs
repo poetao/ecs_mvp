@@ -1,26 +1,20 @@
 using System;
-using System.Linq;
 using System.Reflection;
-using MVP.Framework.Core.Reflections;
-using MVP.Framework.Core.States;
-using MVP.Framework.Views;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     public static class Reflection
     {
         public static bool useAsmDef { get; set; } = true;
 
-	    public static Type GetRuntimeType(string path, string assemblyName = null)
+	    public static Type GetRuntimeType(string path, Path.ASSEMBLY_TYPE assemblyType = Path.ASSEMBLY_TYPE.GAME)
         {
-            if (!useAsmDef) return Type.GetType(path);
-
-            assemblyName = string.IsNullOrEmpty(assemblyName) ? "Game" : assemblyName;
-            if (assemblyName.Equals("Framework"))
+            if (!useAsmDef || assemblyType == Path.ASSEMBLY_TYPE.FRAMEWORK)
             {
                 return Type.GetType(path);
             }
 
+            var assemblyName = Path.instance.GetAssemblyPath(assemblyType);
             var assembly = Assembly.Load(assemblyName);
             if (assembly == null)
             {
@@ -66,7 +60,7 @@ namespace MVP.Framework.Core
             }
             catch (Exception e)
             {
-                Log.Reflection.E("Fail CallMethod for mehodName " + instance.GetType().ToString() + " : " + methodName + ", " + e.Message);
+                Log.Reflection.E($"Fail CallMethod for methodName {instance.GetType()} : {methodName}, {e.Message}");
                 return false;
             }
             return true;
@@ -84,7 +78,7 @@ namespace MVP.Framework.Core
             }
             catch (Exception e)
             {
-                Log.Reflection.E("Fail CallMehodForRet for mehodName " + instance.GetType().ToString() + " : " + methodName + ", " + e.Message);
+                Log.Reflection.E($"Fail CallMethodForRet for methodName {instance.GetType()} : {methodName}, {e.Message}");
             }
             return null;
         }
@@ -102,7 +96,7 @@ namespace MVP.Framework.Core
             }
             catch (Exception e)
             {
-                Log.Reflection.E("Fail GetPropertyBase for mehodName " + instance.GetType().ToString() + " : " + name + ", " + e.Message);
+                Log.Reflection.E($"Fail GetPropertyBase for methodName {instance.GetType()} : {name}, {e.Message}");
                 return false;
             }
             return true;
@@ -131,10 +125,16 @@ namespace MVP.Framework.Core
             }
             catch (Exception e)
             {
-                Log.Reflection.E("Fail SetProperty for name " + instance.GetType().ToString() + " : " + name + ", " + e.Message);
+                Log.Reflection.E($"Fail SetProperty for name  {instance.GetType()} : {name}, {e.Message}");
                 return false;
             }
             return true;
+        }
+
+        public static FieldInfo[] GetFields(Type type)
+        {
+            var flag = BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
+            return type.GetFields(flag);
         }
 
         public static bool GetFieldValue<T>(object instance, string name, ref T ret)
@@ -150,7 +150,7 @@ namespace MVP.Framework.Core
             }
             catch (Exception e)
             {
-                Log.Reflection.E("Fail GetFieldValue for name " + instance.GetType().ToString() + " : " + name + ", " + e.Message);
+                Log.Reflection.E($"Fail GetFieldValue for name  {instance.GetType()} : {name}, {e.Message}");
                 return false;
             }
             return true;
@@ -268,7 +268,12 @@ namespace MVP.Framework.Core
             return method.CreateDelegate(typeof(Func<T1, T2, T3, TReturn>), instance) as Func<T1, T2, T3, TReturn>;
 	    }
 
-        public static T CreateInstance<T>(string path, string assembly, params object[] args) where T : class
+        public static T CreateInstance<T>(string path) where T : class
+        {
+            return CreateInstance<T>(path, Path.ASSEMBLY_TYPE.GAME);
+        }
+
+        public static T CreateInstance<T>(string path, Path.ASSEMBLY_TYPE assembly, params object[] args) where T : class
         {
             var type = GetRuntimeType(path, assembly);
             if (type == null)

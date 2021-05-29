@@ -1,8 +1,8 @@
 using System;
-using MVP.Framework.Views;
+using Framework.Views;
 using UniRx;
 
-namespace MVP.Framework.Components.Windows
+namespace Framework.Components.Windows
 {
     public class Toast : Component
     {

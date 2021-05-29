@@ -1,7 +1,6 @@
-namespace MVP.Framework
+namespace Framework
 {
     public class Model
     {
-        
     }
 }

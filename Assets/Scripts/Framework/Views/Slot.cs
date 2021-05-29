@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
-using MVP.Framework.Core.Reflections;
-using MVP.Framework.Core.States;
+using Framework.Core.Reflections;
+using Framework.Core.States;
 
-namespace MVP.Framework.Views
+namespace Framework.Views
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SlotAttribute : Attribute
@@ -32,20 +32,18 @@ namespace MVP.Framework.Views
 
             var parameters = CastWrapParameters(proxyParameters);
             if (ProcessButton(target, action, parameters, throttle)) return;
-            if (ProcessInputField(target, action, parameters, throttle)) return;
-
             // @todo add more compoents support
+            
+            ProcessInputField(target, action, throttle);
         }
 
-        private static bool ProcessInputField(GameObject target, Func<WrapBase[], WrapBase> action, WrapBase[] parameters, float throttle)
+        private static void ProcessInputField(GameObject target, Func<WrapBase[], WrapBase> action, float throttle)
         {
             var inputField = target.GetComponent<InputField>();
-            if (inputField == null) return false;
+            if (inputField == null) return;
 
 	         inputField.OnValueChangedAsObservable().ThrottleFirst(TimeSpan.FromSeconds(throttle))
                  .Subscribe((x) => action(new WrapBase[] {Wrap<string>.Create(x)})).AddTo(target);
-
-            return true;
         }
 
         private static bool ProcessButton(GameObject target, Func<WrapBase[], WrapBase> action, WrapBase[] parameters, float throttle)

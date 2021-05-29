@@ -1,10 +1,10 @@
 using UnityEngine;
 using UniRx;
-using MVP.Framework.Bootstraps;
+using Framework.Bootstraps;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
-    using Container = MVP.Framework.Components.Windows.Container;
+    using Container = Framework.Components.Windows.Container;
     public interface ILinkDataManager
     {
         void Close(LinkData data);
@@ -45,7 +45,7 @@ namespace MVP.Framework.Core
             data.manager        = manager;
             data.path           = path;
             data.node           = Resource.instance.Instantiate(prefab);
-            data.presenter      = Bridge.instance.component.Link(data, args);
+            data.presenter      = Bridge.Instance.Component.Link(data, args);
             return data;
         }
 

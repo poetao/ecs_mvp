@@ -4,15 +4,16 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
-using MVP.Framework.Core;
+using Framework.Core;
+using ASSEMBLY_TYPE = Framework.Core.Path.ASSEMBLY_TYPE;
 
-namespace MVP.Editors
+namespace Editors
 {
 	public static class ScriptAutoBuilderTemplate
 	{
 	   public static string ViewClass =
-@"using MVP.Framework;
-using MVP.Framework.Views;
+@"using Framework;
+using Framework.Views;
 
 namespace Views#NameSpace#
 {
@@ -21,12 +22,12 @@ namespace Views#NameSpace#
 ";
 
 	    public static string PresenterClass =
-@"using MVP.Framework;
-using MVP.Framework.Presenters;
+@"using Framework;
+using Framework.Presenters;
 
 namespace Presenters#NameSpace#
 {
-    using Builder = MVP.Framework.Bootstraps.Components.Context;
+    using Builder = Framework.Bootstraps.Components.Context;
 
     public class #Class# : Presenter
     {
@@ -43,7 +44,7 @@ namespace Presenters#NameSpace#
 ";
 
 	    public static string ComponentClass = 
-@"using MVP.Framework.Views;
+@"using Framework.Views;
 
 namespace #AssemblySpace#Components#NameSpace#
 {
@@ -68,20 +69,20 @@ namespace #AssemblySpace#Components#NameSpace#
 				var prefab = go.transform.root.gameObject;
 				var relatePath = GetPrefabRelativePath(prefab);
 				BuildViewScript(prefab, GetViewPath(relatePath));
-				BuildPresenterScript(prefab, GetPresenterPath(relatePath, "Game"));
+				BuildPresenterScript(prefab, GetPresenterPath(relatePath));
 			}
 
 			AssetDatabase.SaveAssets();
 			AssetDatabase.Refresh();
 		}
 
-	    public static void BuildComponentScript(GameObject node, string scriptPath, string assembly)
+	    public static void BuildComponentScript(GameObject node, string scriptPath, ASSEMBLY_TYPE assembly)
 	    {
 			if (File.Exists(scriptPath)) return;
 
 			var name		= GetNameFromScriptPath(scriptPath);
 			var nameSpace	= GetNameSpaceFromScriptPath(scriptPath, "Component");
-			var assemblySpace	= GetAssemblySpace(assembly);
+			var assemblySpace	= $"{Framework.Core.Path.instance.GetAssemblyPath(assembly)}.";
 			var content		= ScriptAutoBuilderTemplate.ComponentClass;
 			content = content.Replace("#NameSpace#", nameSpace);
 			content = content.Replace("#Class#", name);
@@ -141,27 +142,31 @@ namespace #AssemblySpace#Components#NameSpace#
 			WriteFile(content, name, scriptPath); 
 		}
 
-	    public static string GetComponentPath(string relatePath, string assembly)
+	    public static string GetComponentPath(string relatePath, ASSEMBLY_TYPE assembly)
 	    {
-		    if (assembly.Equals("Framework"))
+		    if (assembly == ASSEMBLY_TYPE.FRAMEWORK)
 		    {
 				return $"{Application.dataPath}/Scripts/Framework/Components/{relatePath}.cs";
 		    }
-			return $"{Application.dataPath}/Scripts/Game/Component/{relatePath}.cs";
+			return $"{Application.dataPath}/Scripts/Game/Components/{relatePath}.cs";
 	    }
 
-	    public static string GetViewPath(string relatePath)
+	    public static string GetViewPath(string relatePath, ASSEMBLY_TYPE assembly = ASSEMBLY_TYPE.GAME)
 		{
-			return $"{Application.dataPath}/Scripts/Game/View/{relatePath}.cs";
+			if (assembly == ASSEMBLY_TYPE.FRAMEWORK)
+			{
+				return $"{Application.dataPath}/Scripts/Game/Views/Frameworks/{relatePath}.cs";
+			}
+			return $"{Application.dataPath}/Scripts/Game/Views/{relatePath}.cs";
 		}
 
-	    public static string GetPresenterPath(string relatePath, string assembly)
+	    public static string GetPresenterPath(string relatePath, ASSEMBLY_TYPE assembly = ASSEMBLY_TYPE.GAME)
 		{
 			if (assembly.Equals("Framework"))
 			{
-				return $"{Application.dataPath}/Scripts/Game/Presenter/Framework/{relatePath}.cs";
+				return $"{Application.dataPath}/Scripts/Game/Presenters/Frameworks/{relatePath}.cs";
 			}
-			return $"{Application.dataPath}/Scripts/Game/Presenter/{relatePath}.cs";
+			return $"{Application.dataPath}/Scripts/Game/Presenters/{relatePath}.cs";
 		}
 
 	    private static void WriteFile(string content, string name, string path)
@@ -185,13 +190,13 @@ namespace #AssemblySpace#Components#NameSpace#
 			switch (type)
 			{
 				case "Views":
-					match = Regex.Match(path, @".+Scripts/Game/View(.+)/[^/]+\.cs");
+					match = Regex.Match(path, @".+Scripts/Game/Views(.+)/[^/]+\.cs");
 					break;
 				case "Presenters":
-					match = Regex.Match(path, @".+Scripts/Game/Presenter(.+)/[^/]+\.cs");
+					match = Regex.Match(path, @".+Scripts/Game/Presenters(.+)/[^/]+\.cs");
 					break;
 				case "Component":
-					match = Regex.Match(path, @".+Scripts/Game/Component(.+)/[^/]+\.cs");
+					match = Regex.Match(path, @".+Scripts/Game/Components(.+)/[^/]+\.cs");
 					if (match.Length <= 0)
 					{
 						match = Regex.Match(path, @".+Scripts/Framework/Components(.+)/[^/]+\.cs");
@@ -200,12 +205,6 @@ namespace #AssemblySpace#Components#NameSpace#
 				default: return "";
 			}
 			return match.Groups[1].Value.Replace("/", ".");
-		}
-
-		private static string GetAssemblySpace(string assembly)
-		{
-			if (assembly.Equals("Framework")) return "MVP.Framework.";
-			return "";
 		}
 
 		private static string GetNameFromScriptPath(string path)

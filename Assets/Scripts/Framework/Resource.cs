@@ -6,11 +6,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UniRx;
 using UniRx.Triggers;
-using MVP.Framework.Core;
-using MVP.Framework.Resources;
+using Framework.Resources;
 
-namespace MVP.Framework
+namespace Framework
 {
+    using Log = Core.Log;
+
     public abstract class Resource
     {
         public enum TYPE { Prefab, Scene, AssetBundle, Presenter, View, Component, Storage }
@@ -150,7 +151,7 @@ namespace MVP.Framework
         protected virtual async Task<AssetBundleManifest> LoadAssetBundleManifest()
         {
             var option = new LoadingOption();
-            var path= $"Assets/{Path.AssetBundleFolder}/{Path.AssetBundleFolder}";
+            var path= $"Assets/{Core.Path.AssetBundleFolder}/{Core.Path.AssetBundleFolder}";
             var assetBundle = await LoadAssetBundleSingleAsync(path, option);
             var assetBundleRef = new AssetRef(path, assetBundle);
 
@@ -319,13 +320,13 @@ namespace MVP.Framework
                     if (progress != null) progress(x.Percent());
                     promise.OnNext(0);
                     promise.OnCompleted();
+                    promise.Dispose();
                     return false;
                 }).Subscribe(x =>
                 {
                     if (progress != null) progress(x.Percent());
                 });
             await promise;
-            promise.Dispose();
             disposable.Dispose();
             return true;
         }

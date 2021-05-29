@@ -1,7 +1,7 @@
-using MVP.Framework.Core.States;
+using Framework.Core.States;
 using UnityEngine;
 
-namespace MVP.Framework.Views
+namespace Framework.Views
 {
     public class Context
     {

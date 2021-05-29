@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using MVP.Framework.Bootstraps;
-using MVP.Framework.Core;
-using MVP.Framework.Core.Reflections;
+using Framework.Bootstraps;
+using Framework.Core;
 
-namespace MVP.Framework.Views
+namespace Framework.Views
 {
     [Serializable]
     public class ProxyLinkItem
@@ -35,23 +34,23 @@ namespace MVP.Framework.Views
     public class Proxy : MonoBehaviour
     {
         public bool                     isComponent;
-        public string                   assembly;
-        public string                   path;
         public string                   presenterRef;
+        public string                   path;
+        public Path.ASSEMBLY_TYPE       assembly;
         public List<ProxyLinkItem>      linkItems;
         public List<ProxySlotItem>      slotItems;
         public List<ProxyParameterItem> parameterItems;
 
         private void Awake()
         {
-            if (Bridge.instance == null)
+            if (Bridge.Instance == null)
             {
                 var sceneName = SceneManager.GetActiveScene().name;
                 Log.Framework.W($"Please open {sceneName} scene after Bootstrap!");
                 return;
             }
 
-            Bridge.instance.component.Initialization(this);
+            Bridge.Instance.Component.Initialization(this);
         }
 
 		public void DestroySelf()

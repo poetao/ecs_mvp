@@ -3,9 +3,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UniRx;
 using System.Linq;
-using MVP.Framework.Core.States;
+using Framework.Core;
+using Framework.Core.States;
 
-namespace MVP.Framework.Views
+namespace Framework.Views
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class LinkAttribute : Attribute
@@ -31,21 +32,29 @@ namespace MVP.Framework.Views
 
 	        property.SubscribeWithState(target, (value, o) =>
 	        {
+		        if (value == WrapBase.Empty) return;
+
+		        bool suc;
 		        switch (compType)
 		        {
-			        case "UnityEngine.UI.Text": ProcessText(o, value); break;
-			        case "UnityEngine.UI.Slider": ProcessSlider(o, value); break;
-			        case "UnityEngine.UI.Button": ProcessButton(o, value); break;
-			        case "UnityEngine.Animator": ProcessAnimator(o, value); break;
-			        case "UnityEngine.Animation": ProcessAnimation(o, value); break;
-			        default: ProcessGameObject(o, value); break;
+			        case "UnityEngine.UI.Text": suc = ProcessText(o, value); break;
+			        case "UnityEngine.UI.Slider": suc = ProcessSlider(o, value); break;
+			        case "UnityEngine.UI.Button": suc = ProcessButton(o, value); break;
+			        case "UnityEngine.Animator": suc = ProcessAnimator(o, value); break;
+			        case "UnityEngine.Animation": suc = ProcessAnimation(o, value); break;
+			        default: suc = ProcessGameObject(o, value); break;
+		        }
+
+		        if (!suc)
+		        {
+			        Log.Framework.I("Link Bind Process Fail for {0}, {1}", o, value);
 		        }
 	        }).AddTo(target);
         }
 
         public static IObservable<WrapBase> GetProperty(string name, View view, IState store)
         {
-	        var method = Core.Reflection.GetMethod(view, name);
+	        var method = Reflection.GetMethod(view, name);
 	        if (method == null) return null;
 
 	        var parameters = method.GetParameters();

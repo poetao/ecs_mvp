@@ -1,22 +1,20 @@
-using MVP.Framework.Core;
-using MVP.Framework.Views;
+using Framework.Views;
 
-namespace MVP.Framework.Components.Windows
+namespace Framework.Components.Windows
 {
     public class Dialog : Component, ITrait
     {
-        [Inspector]
-        public bool animation;
+        [Inspector] private bool animation = false;
 
         private Container container;
 
         public void Bind(Container container)
         {
             this.container = container;
-            if (animation) container.PlayAnimation("open");
+            if (animation) this.container.PlayAnimation("open");
         }
 
-        public TraitContext Adjust(TraitContext context)
+        public TraitContext Adjust(TraitContext traitContext)
         {
             return new TraitContext()
             {

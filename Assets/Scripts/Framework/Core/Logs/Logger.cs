@@ -1,7 +1,7 @@
 using System.Globalization;
 using UnityEngine;
 
-namespace MVP.Framework.Core.Logs
+namespace Framework.Core.Logs
 {
     public enum LEVEL
     {

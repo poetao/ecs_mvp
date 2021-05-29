@@ -1,14 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using MVP.Framework.Core;
-using UnityEngine;
 using UniRx;
-using MVP.Framework.Core.States;
-using MVP.Framework.Presenters;
+using Framework.Core;
+using Framework.Core.States;
+using Framework.Presenters;
 
-namespace MVP.Framework
+namespace Framework
 {
     using Builder = Bootstraps.Components.Context;
 
@@ -18,8 +15,6 @@ namespace MVP.Framework
         public      CompositeDisposable disposables;
         protected	Context context;
         protected   Dictionary<string, Presenter> subPresenters;
-
-        public Presenter() {}
 
 	    public void Build(Builder builder, params object[] args)
 	    {
@@ -76,7 +71,7 @@ namespace MVP.Framework
         }
     }
 
-    public static partial class DisposableExtensions
+    public static class DisposableExtensions
     {
 	    public static T AddTo<T>(this T disposable, Presenter presenter) where T : IDisposable
 	    {

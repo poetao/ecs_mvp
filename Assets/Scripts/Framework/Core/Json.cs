@@ -1,11 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UniRx;
 using System;
+using System.Collections;
 using Newtonsoft.Json;
+using UniRx;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     public static class Json
     {
@@ -13,7 +11,7 @@ namespace MVP.Framework.Core
         {
             return Observable.FromMicroCoroutine<T>(observer =>
             {
-                return FromStringByCoroutine<T>(observer, data);
+                return FromStringByCoroutine(observer, data);
             });
         }
 

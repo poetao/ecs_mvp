@@ -1,11 +1,10 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using MVP.Framework.Core;
-using MVP.Framework.Bootstraps;
+using Framework.Core;
+using Framework.Bootstraps;
 
-namespace MVP.Framework
+namespace Framework
 {
     public struct SceneData
     {
@@ -70,7 +69,7 @@ namespace MVP.Framework
             var context         = new LinkData();
             context.path        = data.name;
             context.node        = new GameObject($"{data.name}<Root>");
-            context.presenter   = Bridge.instance.component.Link(context, data.args);
+            context.presenter   = Bridge.Instance.Component.Link(context, data.args);
 
             if (disposable != null) disposable.Dispose();
             disposable = context.presenter;

@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using MVP.Framework.Core;
-using UnityEditor.VersionControl;
+using Framework.Core;
 using UnityEngine;
 
-namespace MVP.Framework.Resources
+namespace Framework.Resources
 {
     public class AssetRef
     {
@@ -67,9 +65,10 @@ namespace MVP.Framework.Resources
             }
 
             foreach (var dependence in dependencies) dependence.Release();
-            if (asset is AssetBundle)
+            var assetBundle = asset as AssetBundle;
+            if (assetBundle != null) 
             {
-                (asset as AssetBundle).Unload(true);
+                assetBundle.Unload(true);
             }
             else
             {

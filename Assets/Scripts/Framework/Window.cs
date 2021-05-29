@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MVP.Framework.Components.Windows;
-using MVP.Framework.Core;
-using MVP.Framework.Windows;
 using UniRx;
+using Framework.Components.Windows;
+using Framework.Core;
+using Framework.Windows;
 
-namespace MVP.Framework
+namespace Framework
 {
     public class Window : ILinkDataManager
     {
@@ -46,14 +46,13 @@ namespace MVP.Framework
 
         public void Close(LinkData data)
         {
-            var container = data.container as Components.Windows.Container;
-            if (!container.Validate())
+            if (!data.container.Validate())
             {
                 data.subject.OnError(new System.Exception($"{data.path} window not validate"));
                 return;
             }
 
-            container.Destroy();
+            data.container.Destroy();
         }
 
         public void Destroy(LinkData data)

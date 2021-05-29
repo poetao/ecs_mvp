@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     [Serializable]
     public class Reference : IState
@@ -49,6 +49,12 @@ namespace MVP.Framework.Core.States
         public IDictionary<string, WrapBase> GetRaw()
         {
             return state.GetRaw();
+        }
+
+        public State GetState()
+        {
+            if (string.IsNullOrEmpty(path)) return state;
+            return state.Get<State>(path);
         }
     }
 }

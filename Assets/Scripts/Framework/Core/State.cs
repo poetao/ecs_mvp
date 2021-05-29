@@ -2,10 +2,9 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UniRx;
-using MVP.Framework.Core.States;
-using UnityEngine.Animations;
+using Framework.Core.States;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     [AttributeUsage(AttributeTargets.Field)]
     public class StateFieldAttribute : Attribute
@@ -28,7 +27,7 @@ namespace MVP.Framework.Core
         {
             if (!subjectMap.ContainsKey(path))
             {
-                subjectMap[path] = new Subject<WrapBase>();
+                subjectMap[path] = new BehaviorSubject<WrapBase>(WrapBase.Empty);
             }
 
             return subjectMap[path];
@@ -38,7 +37,8 @@ namespace MVP.Framework.Core
         {
             if (dataSet.TryGetValue(name, out var value))
             {
-                return (value as Wrap<T>).Value;
+                var wrap = value as Wrap<T>;
+                if (wrap != null) return wrap.Value;
             }
 
             return default(T);
@@ -50,7 +50,16 @@ namespace MVP.Framework.Core
             if (dataSet.TryGetValue(name, out var existValue))
             {
                 wrap = existValue as Wrap<T>;
-                if (wrap.Value.Equals(value)) return;
+                if (wrap == null)
+                {
+                    wrap = WrapPool<T>.Rent();
+                    dataSet.Remove(name);
+                    dataSet.Add(name, wrap);
+                }
+                else
+                {
+                    if (wrap.Value.Equals(value)) return;
+                }
             }
             else
             {
@@ -62,11 +71,11 @@ namespace MVP.Framework.Core
             Notify(name, wrap);
         }
 
-        private void Notify(string name, WrapBase wrap)
+        protected void Notify(string name, WrapBase wrap)
         {
             if (!subjectMap.ContainsKey(name))
             {
-                subjectMap[name] = new Subject<WrapBase>();
+                subjectMap[name] = new BehaviorSubject<WrapBase>(WrapBase.Empty);
             }
 
             subjectMap[name].OnNext(wrap);
@@ -74,11 +83,11 @@ namespace MVP.Framework.Core
 
         public IDisposable Subscribe(string path, IObserver<WrapBase> observer)
         {
-            var subject = GetObservable(path) as Subject<WrapBase>;
-            var disposable = subject.Subscribe(observer);
+            var subject = GetObservable(path) as BehaviorSubject<WrapBase>;
+            var disposable = subject?.Subscribe(observer);
             if (dataSet.ContainsKey(path))
             {
-                subject.OnNext(dataSet[path]);
+                subject?.OnNext(dataSet[path]);
             }
 
             return disposable;
@@ -117,8 +126,7 @@ namespace MVP.Framework.Core
             if (!recursion) return;
 
             var list = path.Split('.');
-            list.Skip(list.Length);
-	        list.Aggregate<string, string>("", (ret, data) =>
+            list.Skip(list.Length).Aggregate("", (ret, data) =>
             {
                 ret = $"{ret}.{data}";
                 Notify(ret, false);

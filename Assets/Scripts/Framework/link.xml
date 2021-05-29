@@ -1,4 +1,4 @@
-<assembly fullname="MVP.Framework">
-    <namespace fullname="MVP.Framework" preserve="all"/>
+<assembly fullname="Framework">
+    <namespace fullname="Framework" preserve="all"/>
 </assembly>
 

@@ -1,7 +1,7 @@
-using MVP.Framework.Core;
-using MVP.Framework.Core.States;
+using Framework.Core;
+using Framework.Core.States;
 
-namespace MVP.Framework.Presenters
+namespace Framework.Presenters
 {
     using Builder = Bootstraps.Components.Context;
 
@@ -13,7 +13,7 @@ namespace MVP.Framework.Presenters
 
         public static Context Create(Builder builder)
         {
-            var state = builder.TakeState() ?? new Core.State();
+            var state = builder.TakeState() ?? new State();
             return new Context(builder, state);
         }
 

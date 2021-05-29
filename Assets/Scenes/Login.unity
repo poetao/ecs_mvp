@@ -466,9 +466,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isComponent: 1
-  assembly: Game
-  path: Framework/List
   presenterRef: server
+  path: Frameworks/List
+  assembly: 0
   linkItems: []
   slotItems: []
   parameterItems:
@@ -654,9 +654,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isComponent: 0
-  assembly: 
-  path: Login
   presenterRef: 
+  path: Login
+  assembly: 0
   linkItems:
   - name: name
     gameObject: {fileID: 34759156}

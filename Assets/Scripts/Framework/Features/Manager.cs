@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MVP.Framework.Core;
-using MVP.Framework.Core.States;
+using Framework.Core;
 
-namespace MVP.Framework.Features
+namespace Framework.Features
 {
     public class Manager
 
@@ -54,13 +53,11 @@ namespace MVP.Framework.Features
 
         public void Create(string path, params object[] args)
         {
-            var instance = Reflection.CreateInstance<Feature>(path, null);
-
+            var feature = Reflection.CreateInstance<Feature>(path);
             var key = GetFeatureStoreKey(path);
             var state = GetManager<Store>().Reference(key);
-            instance.Create(this, state, args);
-
-            features.Add(instance.GetType(), instance);
+            feature.Create(this, state, args);
+            features.Add(instance.GetType(), feature);
         }
 
         public T GetManager<T>() where T : class

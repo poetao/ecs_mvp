@@ -1,14 +1,14 @@
 using System;
 
-namespace MVP.Framework.Core.States
+namespace Framework.Core.States
 {
     public class TypeSelectionEnable : Attribute
     {
-        public string Category = "Default";
+        public readonly string Category;
 
         public TypeSelectionEnable(string category)
         {
-            this.Category = category;
+            Category = category;
         }
     }
 }

@@ -1138,9 +1138,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isComponent: 0
-  assembly: 
-  path: Home
   presenterRef: 
+  path: Home
+  assembly: 0
   linkItems:
   - name: Coin
     gameObject: {fileID: 1546508360}
@@ -1157,7 +1157,7 @@ MonoBehaviour:
     gameObject: {fileID: 1794539102}
     throttle: 0
     parameters:
-    - intValue: 3
+    - intValue: 2
       uintValue: 0
       longValue: 0
       ulongValue: 0

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace MVP.Framework.Core
+namespace Framework.Core
 {
     /// <summary>
     /// 如果获取 <typeparamref name="TSource"/> 对应信息的过程比较耗时（例如反射），

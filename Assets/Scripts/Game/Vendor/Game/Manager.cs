@@ -2,10 +2,12 @@ using System;
 using System.Threading.Tasks;
 using UniRx;
 
-namespace Vendor.Game
+namespace Game.Vendor.Game
 {
     public class Manager : IDisposable
     {
+        private string name;
+
         public static bool Check()
         {
             return true;
@@ -14,16 +16,19 @@ namespace Vendor.Game
         public static async void Play(string name, params object[] args)
         {
             var manager = Build(name);
-            var result = await manager.Run(name, args);
+            var result = await manager.Run(args);
             if (!result) manager.Dispose();
         }
 
         private static Manager Build(string name)
         {
-            return new Manager();
+            return new Manager()
+            {
+                name = name,
+            };
         }
 
-        public async Task<bool> Run(string name, params object[] args)
+        public async Task<bool> Run(params object[] args)
         {
             await Load(name, args);
             return true;

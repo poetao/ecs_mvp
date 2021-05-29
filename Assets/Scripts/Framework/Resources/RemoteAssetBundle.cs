@@ -1,9 +1,9 @@
 using System.IO;
 using System.Threading.Tasks;
-using MVP.Framework.Core;
+using Framework.Core;
 using UnityEngine;
 
-namespace MVP.Framework.Resources
+namespace Framework.Resources
 {
     public class RemoteAssetBundle : Resource
     {

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using MVP.Framework.Core;
+using Framework.Core;
 using UnityEngine;
-using MVP.Framework.Features;
+using Framework.Features;
 
-namespace MVP.Framework
+namespace Framework
 {
     public interface IStartupContext
     {
@@ -27,14 +27,12 @@ namespace MVP.Framework
 
         private async Task Initialize(IStartupContext context)
         {
-            await Setup(context);
+            await Setup();
             await Run(context);
         }
 
-        private async Task Setup(IStartupContext context)
+        private async Task Setup()
         {
-            var maping = context.GetModules();
-
             Path.Setup();
             Loading.Setup();
             Store.Setup();
@@ -49,10 +47,10 @@ namespace MVP.Framework
 
         private async Task Run(IStartupContext context)
         {
-            var root = await Window.instance.Load("Framework/Root");
+            var root = await Window.instance.Load("Frameworks/Root");
             ViewPort = root.node.transform.Find("Viewport").gameObject;
             UICamera = root.node.transform.Find("UICamera").GetComponent<Camera>();
-            GameObject.DontDestroyOnLoad(root.node);
+            Object.DontDestroyOnLoad(root.node);
             await Scene.instance.Run(context.Setup());
         }
     }

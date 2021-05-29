@@ -1,17 +1,16 @@
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using MVP.Framework.Core;
-using MVP.Framework.Components.Windows;
+using Framework.Core;
+using Framework.Components.Windows;
 
-namespace MVP.Framework.Windows
+namespace Framework.Windows
 {
     public struct ContainerInfo
     {
-        public static string path                = "Framework/Windows/Container";
+        public static string path                = "Frameworks/Windows/Container";
         public static Type component             = typeof(Container);
-        public static Resources.AssetRef prefab  = null;
+        public static Resources.AssetRef prefab;
     }
     
     public class Factory
@@ -30,6 +29,7 @@ namespace MVP.Framework.Windows
             if (prefab == null || !prefab.Valid())
             {
                 Log.Window.Exception(new Exception($"Factory Load {path} prefab error!"));
+                return null;
             }
 
             var data = Utils.Instantitate(prefab, path, manager, args);
@@ -39,13 +39,18 @@ namespace MVP.Framework.Windows
 
         public async Task<LinkData> Instantitate(ILinkDataManager manager, string path, params object[] args)
         {
-            var containerData   = Utils.Instantitate(ContainerInfo.prefab, ContainerInfo.path, null) as LinkData;
-            var container       = Component.GetPeer(containerData.node, ContainerInfo.component) as Container;
             var data            = await Load(path, manager, args);
+            var containerData   = Utils.Instantitate(ContainerInfo.prefab, ContainerInfo.path, null);
+            var container       = Component.GetPeer(containerData.node, ContainerInfo.component) as Container;
+            if (container == null)
+            {
+                Log.Window.E("Instantitate Container Error");
+                return null;
+            }
 
-            #if UNITY_EDITOR
+#if UNITY_EDITOR
             containerData.node.name = $"{path.Replace('/', '.')}(Container)";
-            #endif
+#endif
 
             TryAddToCanvas(containerData.node);
             container.Bind(manager, data);

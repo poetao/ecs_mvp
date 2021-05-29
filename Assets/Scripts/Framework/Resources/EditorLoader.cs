@@ -1,10 +1,9 @@
-using System;
 using System.Threading.Tasks;
 using UniRx;
 using UnityEditor;
 using UnityEngine;
 
-namespace MVP.Framework.Resources
+namespace Framework.Resources
 {
     public class EditorLoader : Resource
     {

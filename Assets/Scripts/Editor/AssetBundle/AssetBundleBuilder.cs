@@ -1,9 +1,9 @@
 using System.IO;
-using MVP.Framework.Core;
+using Framework.Core;
 using UnityEditor;
 using UnityEngine;
 
-namespace MVP.Editors.AssetBundle
+namespace Editors.AssetBundle
 {
     using Path = System.IO.Path;
     public class AssetBundleBuilder

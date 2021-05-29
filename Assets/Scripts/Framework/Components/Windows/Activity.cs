@@ -1,4 +1,4 @@
-namespace MVP.Framework.Components.Windows
+namespace Framework.Components.Windows
 {
     public class Activity : Component, ITrait
     {
@@ -6,7 +6,7 @@ namespace MVP.Framework.Components.Windows
         {
         }
 
-        public TraitContext Adjust(TraitContext context)
+        public TraitContext Adjust(TraitContext traitContext)
         {
             return new TraitContext()
             {
