@@ -6,10 +6,10 @@ namespace Framework.Core.States
     [Serializable]
     public class Reference : IState
     {
-        private State state;
+        private IState state;
         private string path;
 
-        public Reference(State state, string path)
+        public Reference(IState state, string path)
         {
             this.state = state;
             this.path  = path;
@@ -18,6 +18,11 @@ namespace Framework.Core.States
         public void Set<T>(string path, T value)
         {
             this.state.Set(map(path), value);
+        }
+
+        public WrapBase Get(string path)
+        {
+            return this.state.Get(map(path));
         }
 
         public T Get<T>(string path)
@@ -35,26 +40,21 @@ namespace Framework.Core.States
             return this.state.Subscribe(map(path), observer);
         }
 
-        public void Notify()
+        public void Notify(string path)
         {
-            this.state.Notify();
+            this.state.Notify(map(path));
+        }
+
+        public IState GetState()
+        {
+            if (string.IsNullOrEmpty(path)) return state;
+            return state.Get<IState>(path);
         }
 
         private string map(string path)
         {
             if (string.IsNullOrEmpty(path)) return this.path;
             return $"{this.path}.{path}";
-        }
-
-        public IDictionary<string, WrapBase> GetRaw()
-        {
-            return state.GetRaw();
-        }
-
-        public State GetState()
-        {
-            if (string.IsNullOrEmpty(path)) return state;
-            return state.Get<State>(path);
         }
     }
 }

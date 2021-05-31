@@ -57,7 +57,7 @@ namespace Framework.Features
             var key = GetFeatureStoreKey(path);
             var state = GetManager<Store>().Reference(key);
             feature.Create(this, state, args);
-            features.Add(instance.GetType(), feature);
+            features.Add(feature.GetType(), feature);
         }
 
         public T GetManager<T>() where T : class

@@ -3,7 +3,7 @@ using Framework.Views;
 
 namespace Game.Views
 {
-    [Link("name")]
+    [Link("NickName")]
     [Link("enableLogin")]
     [Link("enableEnter")]
 

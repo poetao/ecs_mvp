@@ -11,7 +11,7 @@ namespace Framework
 
     public class Presenter : IDisposable
     {
-		public		IState	state { get; private set; }
+		public		IState	state { get; protected set; }
         public      CompositeDisposable disposables;
         protected	Context context;
         protected   Dictionary<string, Presenter> subPresenters;

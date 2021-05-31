@@ -3,7 +3,6 @@ using Framework;
 using Framework.Core;
 using Framework.Core.States;
 using Framework.Features;
-using UniRx;
 
 namespace Game.Features
 {
@@ -35,20 +34,12 @@ namespace Game.Features
         {
             base.Create(manager, state, args);
 
-            InitState(state);
+            ReInitState();
         }
 
-        private void InitState(IState state)
+        private void ReInitState()
         {
-            var stateRef = state as Reference;
-            if (stateRef == null)
-            {
-                Vendor.Log.User.E("state is not a valid reference for store");
-                return;
-            }
-
-            this.state = stateRef.GetState();
-            var userData = this.state as UserData;
+            var userData = state as UserData;
             if (userData == null)
             {
                 Vendor.Log.User.E("state is not a valid UserData");

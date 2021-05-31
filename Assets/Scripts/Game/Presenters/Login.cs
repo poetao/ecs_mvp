@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using UniRx;
 using Framework;
-using Framework.Core.States;
 using Framework.Presenters;
 using Game.Features;
 using Game.Presenters.Logins;
@@ -24,23 +22,17 @@ namespace Game.Presenters
             scene       = builder.GetManager<Scene>();
             window		= builder.GetManager<Window>();
             account     = builder.GetFeature<Account>();
+            state       = account.GetState();
 
             subPresenters.Add("server", context.Build("Frameworks/List"));
             serverList = Refrence("server") as Frameworks.List;
             subPresenters.Add("item", context.Build("Logins/ServerItem"));
 
-            Subscrible();
+            InitServerList();
         }
 
-        private void Subscrible()
+        private void InitServerList()
         {
-            account.GetObservable().Subscribe(x =>
-            {
-                if (x == WrapBase.Empty) return;
-
-                state.Set("name", x.RefOf<AccountData>().NickName);
-            });
-
             var serverListInfo = new Frameworks.LIST_INFO()
             {
                 list = new List<ServerItemInfo>
@@ -69,7 +61,6 @@ namespace Game.Presenters
                Id = 1,
                NickName = $"TEST_{DateTime.Now.Ticks}",
             });
-            state.Set("isLogin", true);
         }
 
         public async void SwitchToHome()

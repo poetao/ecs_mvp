@@ -26,8 +26,7 @@ namespace Game.Presenters
 
 		private void Subscrible()
 		{
-			user.GetObservable<BANK_INFO>("BankInfo")
-				.Subscribe(x =>
+			user.GetObservable<BANK_INFO>("BankInfo").Subscribe(x =>
 			{
 				state.Set("coin", x.coin);
 				state.Set("money", x.money);

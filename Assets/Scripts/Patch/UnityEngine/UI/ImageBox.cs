@@ -4,7 +4,6 @@ namespace UnityEngine.UI
     {  
         public override void Rebuild(CanvasUpdate update)
         {
-            
         }
     }
 }

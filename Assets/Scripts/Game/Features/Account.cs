@@ -70,9 +70,11 @@ namespace Game.Features
             foreach (var info in data)
             {
                 var path = $"Game.Features.{info.Key}";
-                store.Set(manager.GetFeatureStoreKey(path), info.Value);
+                var storeKey = manager.GetFeatureStoreKey(path);
+                store.Set(storeKey, info.Value);
                 if (info.Key != "Account") manager.Create(path);
             }
+
             state.Set("isLogin", true);
         }
     }

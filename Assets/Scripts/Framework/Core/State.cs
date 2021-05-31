@@ -1,6 +1,6 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Text;
 using UniRx;
 using Framework.Core.States;
 
@@ -33,6 +33,16 @@ namespace Framework.Core
             return subjectMap[path];
         }
 
+        public WrapBase Get(string name)
+        {
+            if (dataSet.TryGetValue(name, out var wrap))
+            {
+                return wrap;
+            }
+
+            return WrapBase.Empty;
+        }
+
         public T Get<T>(string name)
         {
             if (dataSet.TryGetValue(name, out var value))
@@ -44,41 +54,40 @@ namespace Framework.Core
             return default(T);
         }
 
-        public void Set<T>(string name, T value)
+        public void Set<T>(string path, T value)
         {
             Wrap<T> wrap;
-            if (dataSet.TryGetValue(name, out var existValue))
+            if (dataSet.TryGetValue(path, out var wrapBase))
             {
-                wrap = existValue as Wrap<T>;
+                wrap = wrapBase as Wrap<T>;
                 if (wrap == null)
                 {
-                    wrap = WrapPool<T>.Rent();
-                    dataSet.Remove(name);
-                    dataSet.Add(name, wrap);
+                    throw new NullReferenceException($"the exist wrap is null for path: {path}");
                 }
-                else
+
+                OverrideWrap(path, wrap, value);
+                return;
+            }
+
+            var tuple = SearchSubState(path);
+            if (tuple != null)
+            {
+                wrap = tuple.Item2.Get(tuple.Item1) as Wrap<T>;
+                if (wrap != null)
                 {
-                    if (wrap.Value.Equals(value)) return;
+                    OverrideWrap(path, wrap, value);
+                    return;
                 }
             }
-            else
-            {
-                wrap = WrapPool<T>.Rent();
-                dataSet.Add(name, wrap);
-            }
 
+            wrap = WrapPool<T>.Rent();
             wrap.Value = value;
-            Notify(name, wrap);
-        }
-
-        protected void Notify(string name, WrapBase wrap)
-        {
-            if (!subjectMap.ContainsKey(name))
+            dataSet.Add(path, wrap);
+            if (!subjectMap.ContainsKey(path))
             {
-                subjectMap[name] = new BehaviorSubject<WrapBase>(WrapBase.Empty);
+                subjectMap.Add(path, new BehaviorSubject<WrapBase>(WrapBase.Empty));
             }
-
-            subjectMap[name].OnNext(wrap);
+            NotifyWrap(path, wrap);
         }
 
         public IDisposable Subscribe(string path, IObserver<WrapBase> observer)
@@ -98,18 +107,22 @@ namespace Framework.Core
             return dataSet.ContainsKey(path);
         }
 
-        public void Notify()
+        public void Notify(string path = "")
         {
-            foreach (var keyValuePair in subjectMap)
+            if (string.IsNullOrEmpty(path))
             {
-                if (!dataSet.ContainsKey(keyValuePair.Key)) continue;
-                keyValuePair.Value.OnNext(dataSet[keyValuePair.Key]);
+                NotifyAll();
+                return;
             }
-        }
 
-        public IDictionary<string, WrapBase> GetRaw()
-        {
-            return dataSet;
+            if (dataSet.TryGetValue(path, out var wrap))
+            {
+                NotifyWrap(path, wrap);
+            }
+            else
+            {
+                NotifyWrap(path, WrapBase.Empty);
+            }
         }
 
         public void Replace(IDictionary<string, WrapBase> dictionary)
@@ -117,21 +130,100 @@ namespace Framework.Core
             dataSet = dictionary;
         }
 
-        private void Notify(string path, bool recursion = true)
+        protected bool OverrideWrap<T>(string path, Wrap<T> wrap, T value)
         {
-            if (dataSet.ContainsKey(path))
+            if (wrap.Value.Equals(value))
             {
-                Notify(path, dataSet[path]);
+                return false;
             }
-            if (!recursion) return;
 
-            var list = path.Split('.');
-            list.Skip(list.Length).Aggregate("", (ret, data) =>
+            wrap.Value = value;
+            NotifyWrap(path, wrap);
+            return true;
+        }
+
+        protected void NotifyWrap(string path, WrapBase wrap)
+        {
+            if (subjectMap.TryGetValue(path, out var subject))
             {
-                ret = $"{ret}.{data}";
-                Notify(ret, false);
-                return ret;
-            });
+                subject.OnNext(wrap);
+            }
+
+            foreach (var keyValuePair in subjectMap)
+            {
+                var key = keyValuePair.Key;
+                if (!key.StartsWith(path)) continue;
+                if (key == path) continue;
+
+                NotifyPath(key);
+            }
+        }
+
+        protected void NotifyAll()
+        {
+            foreach (var keyValuePair in subjectMap)
+            {
+                if (NotifyPath(keyValuePair.Key)) continue;
+
+                Log.State.I("{0} dataSet Do Not Contains Key {1}", this, keyValuePair.Key);
+            }
+        }
+
+        private bool NotifyPath(string path)
+        {
+            var subject = subjectMap[path];
+            if (dataSet.TryGetValue(path, out var wrap))
+            {
+                subject.OnNext(wrap);
+                return true;
+            }
+
+            var tuple = SearchSubState(path);
+            if (tuple != null)
+            {
+                wrap = tuple.Item2.Get(tuple.Item1);
+                subject.OnNext(wrap);
+                return true;
+            }
+
+            return false;
+        }
+
+        private Tuple<string, IState> SearchSubState(string path)
+        {
+            var pathes = path.Split('.');
+            var count = pathes.Length;
+            for (int i = 0; i < count; ++i)
+            {
+                var prePath = Concat(pathes, 0, i);
+                var postPath = Concat(pathes, i + 1, count - 1);
+                if (dataSet.TryGetValue(prePath, out var wrapState))
+                {
+                    var state = wrapState.RefOf<IState>();
+                    if (state == null) continue;
+
+                    return Tuple.Create(postPath, state);
+                }
+            }
+
+            return null;
+        }
+
+        private string Concat(string[] list, int from, int to)
+        {
+            var count = list.Length;
+            if (from > to || from < 0 || to < 0 || from >= count || to >= count)
+            {
+                return "";
+            }
+
+            var stringBuilder = new StringBuilder();
+            for (int i = from; i < to + 1; ++i)
+            {
+                stringBuilder.Append(list[i]);
+            }
+
+            return stringBuilder.ToString();
         }
     }
 }

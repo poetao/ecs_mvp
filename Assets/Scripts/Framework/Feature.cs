@@ -17,15 +17,12 @@ namespace Framework
 
         public virtual void Create(Manager manager, IState state, params object[] args)
         {
-            this.store       = manager.GetManager<Store>();
-            this.storage     = manager.GetManager<Storage>();
-            this.state       = state;
-            this.disposables = new CompositeDisposable();
+            store       = manager.GetManager<Store>();
+            storage     = manager.GetManager<Storage>();
+            disposables = new CompositeDisposable();
 
-            if (useAutoSave)
-            {
-                this.state.GetObservable().Subscribe(x => AutoSave()).AddTo(disposables);
-            }
+            UseState(state);
+            UseAutoSave();
         }
 
         public virtual void Dispose()
@@ -51,9 +48,43 @@ namespace Framework
             return state.GetObservable(path);
         }
 
+        public IState GetState()
+        {
+            return state;
+        }
+
+        public IState Reference(string path)
+        {
+            return new Reference(state, path);
+        }
+
         protected virtual void AutoSave()
         {
-            storage.SaveBySerialize($"{this.GetType().FullName}", state.GetRaw());
+            storage.SaveBySerialize($"{this.GetType().FullName}", state);
+        }
+
+        private void UseState(IState state)
+        {
+            var reference = state as Reference;
+            if (reference != null)
+            {
+                this.state = reference.GetState();
+                if (this.state == null)
+                {
+                    Log.Startup.I("{0} Get Real State Fail, Continue Use Reference", this);
+                    this.state = state;
+                }
+                return;
+            }
+
+            this.state = state;
+        }
+
+        private void UseAutoSave()
+        {
+            if (!useAutoSave) return;
+
+            state.GetObservable().Subscribe(x => AutoSave()).AddTo(disposables);
         }
     }
 }

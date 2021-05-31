@@ -46,7 +46,7 @@ namespace Framework.Views
             if (Bridge.Instance == null)
             {
                 var sceneName = SceneManager.GetActiveScene().name;
-                Log.Framework.W($"Please open {sceneName} scene after Bootstrap!");
+                Log.Framework.I($"Please open {sceneName} scene after Bootstrap!");
                 return;
             }
 

@@ -1,4 +1,3 @@
-using System;
 using Framework.Core.States;
 
 namespace Framework
@@ -7,7 +6,7 @@ namespace Framework
     {
         public static Store instance { get; private set; }
 
-        public Core.State state { get; private set; }
+        private Core.State state; 
         
         public static void Setup()
         {
@@ -19,29 +18,19 @@ namespace Framework
             state = new Core.State();
         }
 
-        public void Set<T>(string path, T value)
+        public void Set(string path, IState value)
         {
             state.Set(path, value);
         }
 
-        public T Get<T>(string path)
+        public void Notify()
         {
-            return state.Get<T>(path);
+            state.Notify();
         }
 
         public Reference Reference(string path)
         {
             return new Reference(state, path);
-        }
-
-        public IObservable<WrapBase> GetObservable(string path)
-        {
-            return state.GetObservable(path);
-        }
-
-        public IState GetState()
-        {
-            return state;
         }
     }
 }

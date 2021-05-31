@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Extensions
+namespace Patch.Framework
 {
     public static class Externs
     {
@@ -23,7 +23,7 @@ namespace Extensions
 
         public static void Shuffle<T>(this IList<T> list, int? seed = null)
         {
-            System.Random rng = seed != null ? new System.Random((int)seed) : new System.Random();
+            Random rng = seed != null ? new Random((int)seed) : new Random();
             int n = list.Count;
             while (n > 1)
             {

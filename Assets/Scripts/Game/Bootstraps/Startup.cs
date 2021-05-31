@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using Framework.Core;
 
 namespace Game.Bootstraps
 {
@@ -22,14 +21,9 @@ namespace Game.Bootstraps
         public string Setup()
         {
             RegisterAction.Init();
-            EnableDebug(false);
             SetupManager();
 
             return "Login";
-        }
-
-        private void EnableDebug(bool enable)
-        {
         }
 
         private void SetupManager()

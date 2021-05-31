@@ -10,5 +10,6 @@ namespace Framework.Core
         public static Logger Resource       = Logger.Create("Resource",     LEVEL.WARN);
         public static Logger State          = Logger.Create("State",        LEVEL.WARN);
         public static Logger Window         = Logger.Create("Window",       LEVEL.WARN);
+        public static Logger Startup        = Logger.Create("Startup",      LEVEL.WARN);
     }
 }

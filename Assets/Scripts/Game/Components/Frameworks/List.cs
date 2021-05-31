@@ -1,6 +1,7 @@
 using UnityEngine;
 using UniRx;
 using Framework.Core;
+using Framework.Core.States;
 using Framework.Resources;
 
 namespace Game.Components.Frameworks
@@ -40,11 +41,10 @@ namespace Game.Components.Frameworks
 
         private void Subscribe()
         {
-            context.state.GetObservable("data")
-                .Select(x => x.RefOf<LIST_INFO>())
-                .Subscribe(x =>
+            context.state.GetObservable("data").Subscribe(x =>
             {
-                UpdateList(x);
+                if (x == WrapBase.Empty) return;
+                UpdateList(x.RefOf<LIST_INFO>());
             });
         }
 
@@ -74,6 +74,12 @@ namespace Game.Components.Frameworks
 
             var cellPrefabRef = new AssetRef(CellPath, CellPrefab);
             var presenter = context.presenter as Presenters.Frameworks.List;
+            if (presenter == null)
+            {
+                Log.Framework.E("List Component 's Presenter Is Not A List Presenter");
+                return null;
+            }
+
             var data = presenter.Build(cellPrefabRef, CellPath);
             data.node.transform.SetParent(context.gameObject.transform);
             list.Add(index, data);
