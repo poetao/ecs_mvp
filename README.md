@@ -209,6 +209,7 @@ namespace Views
 ## 其它
 
 * DataBinding 只会更新一个关联组件，对不同组件类型有先后顺序，如果一个 GameObject 有 Text 又有 Animation，将会优先更新 Text。具体规则参考 `Assets/Scripts/Framework/Views/Link`。
+* 缺两个代码自动生成工具，RegistAction里的代码应该自动生成，Feature里派生于State的数据结构定义应该根据Attribute自动生成访问和修改代码
 
 ## 引用插件
 
