@@ -3,11 +3,14 @@
     "references": [
         "UnityEngine",
         "UniRx",
-        "AsyncAwaitUtil"
+        "AsyncAwaitUtil",
+        "ILRuntime",
+        "LitJson",
+        "Protobuf"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
-    "allowUnsafeCode": false,
+    "allowUnsafeCode": true,
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
