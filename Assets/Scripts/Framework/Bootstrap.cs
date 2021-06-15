@@ -5,29 +5,35 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using Framework.Core;
+using UnityEngine.SceneManagement;
 
 namespace Framework
 {
-    public class Bootstrap : System.Object
+    public class Bootstrap : MonoBehaviour
     {
-        private static readonly bool useDebug = false;
-        private static readonly bool useILRuntime = false;
+        public bool useDebug;
+        public bool useILRuntime;
 
         [RuntimeInitializeOnLoadMethod]
         public static async void OnLoad()
         {
-            var result = await LoadAsync();
-            if (!result)
+            await SceneManager.LoadSceneAsync("Bootstrap");
+        }
+
+        public async void Start()
+        {
+            var resutl = await LoadAsync();
+            if (!resutl)
             {
-                Log.Startup.E("OnLoad Fail");
+                Log.Startup.E("Bootstrap Fail!");
             }
         }
 
-        private static async Task<bool> LoadAsync()
+        private async Task<bool> LoadAsync()
         {
             byte[] data;
             byte[] symbol = null;
-            var path = AutoPatch.ResolveHotfix4Web("Game.dll");
+            var path = AutoPatch.ResolveHotfix4Web("Hotfix.dll");
             using (var webRequest = UnityWebRequest.Get(path))
             {
                 await webRequest.SendWebRequest();
@@ -42,7 +48,7 @@ namespace Framework
 
             if (useDebug)
             {
-                path = AutoPatch.ResolveHotfix4Web("Game.pdb");
+                path = AutoPatch.ResolveHotfix4Web("Hotfix.pdb");
                 using (var webRequest = UnityWebRequest.Get(path))
                 {
                     await webRequest.SendWebRequest();
@@ -69,7 +75,7 @@ namespace Framework
             return true;
         }
 
-        private static void LoadAssemblyAsDll(byte[] data)
+        private void LoadAssemblyAsDll(byte[] data)
         {
             var assembly = Assembly.Load(data);
             // var hotFixTypes = assembly.GetExportedTypes().ToList();
@@ -79,7 +85,7 @@ namespace Framework
             method?.Invoke(null, null);
         }
 
-        private static async Task LoadAssemblyAsILRuntime(byte[] data, byte[] symbol)
+        private async Task LoadAssemblyAsILRuntime(byte[] data, byte[] symbol)
         {
             //首先实例化ILRuntime的AppDomain，AppDomain是一个应用程序域，每个AppDomain都是一个独立的沙盒
             var appDomain = new ILRuntime.Runtime.Enviorment.AppDomain();

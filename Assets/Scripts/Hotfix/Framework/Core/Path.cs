@@ -18,7 +18,7 @@ namespace Framework.Core
         public static string AssetBundleFolder = "AssetBundles";
 
         private readonly Dictionary<string, string> symboles;
-        private Dictionary<ASSEMBLY_TYPE, string> assemblies;
+        private Dictionary<ASSEMBLY_TYPE, Tuple<string, string>> assemblies;
 
         public static void Setup()
         {
@@ -28,17 +28,25 @@ namespace Framework.Core
         private Path()
         {
             symboles   = new Dictionary<string, string>();
-            assemblies = new Dictionary<ASSEMBLY_TYPE, string>
+            assemblies = new Dictionary<ASSEMBLY_TYPE, Tuple<string, string>>
             {
-                {ASSEMBLY_TYPE.GAME, "Game"}, {ASSEMBLY_TYPE.FRAMEWORK, "Framework"}
+                {ASSEMBLY_TYPE.GAME, Tuple.Create("Hotfix", "Game")},
+                {ASSEMBLY_TYPE.FRAMEWORK, Tuple.Create("Hotfix", "Framework")}
             };
+        }
+
+        public string GetAssemblyName(ASSEMBLY_TYPE assembly)
+        {
+            if (!assemblies.ContainsKey(assembly)) return "";
+
+            return assemblies[assembly].Item1;
         }
 
         public string GetAssemblyPath(ASSEMBLY_TYPE assembly)
         {
             if (!assemblies.ContainsKey(assembly)) return "";
 
-            return assemblies[assembly];
+            return assemblies[assembly].Item2;
         }
 
         public void Map(string symbole, RES_TYPE type, string path, ASSEMBLY_TYPE assembly)

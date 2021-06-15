@@ -12,7 +12,11 @@ namespace Framework.Bootstraps.Components
         {
             path = Path.instance.Resolve(path, Resource.TYPE.Presenter);
             var instance = Reflection.CreateInstance<Presenter>(path);
-            if (instance == null) return null;
+            if (instance == null)
+            {
+                Log.Framework.E("Build Presenter Error, path: {0}, args: {1}", path, args);
+                return null;
+            }
 
             instance.Build(this, args);
             return instance;

@@ -37,8 +37,8 @@ namespace Framework.Vendors.ILRuntimes.Redirectors
             foreach (var i in typeof(System.Activator).GetMethods())
             {
                 //找到名字为CreateInstance，并且是泛型方法的方法定义
-                // if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
-                if (i.Name == "CreateInstance" && i.GetGenericArguments().Length == 1)
+                if (i.Name == "CreateInstance" && i.IsGenericMethodDefinition)
+                // if (i.Name == "CreateInstance" && i.GetGenericArguments().Length == 1)
                 {
                     appdomain.RegisterCLRMethodRedirection(i, CreateInstance);
                 }

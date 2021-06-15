@@ -7,7 +7,6 @@ namespace Game.Bootstraps
     {
         public static async void Constructor()
         {
-            await SceneManager.LoadSceneAsync("Bootstrap");
             Framework.Bootstraps.Bridge.Setup();
             await Framework.Bootstraps.Bridge.Instance.Boot(new Startup());
         }

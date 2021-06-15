@@ -14,14 +14,14 @@ using ILRuntime.CLR.Utils;
 
 namespace ILRuntime.Runtime.Generated
 {
-    unsafe class IEnumeratorAwaitExtensions_Binding_SimpleCoroutineAwaiter_1_Object_Binding
+    unsafe class IEnumeratorAwaitExtensions_Binding_SimpleCoroutineAwaiter_1_AsyncOperation_Binding
     {
         public static void Register(ILRuntime.Runtime.Enviorment.AppDomain app)
         {
             BindingFlags flag = BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly;
             MethodBase method;
             Type[] args;
-            Type type = typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object>);
+            Type type = typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation>);
             args = new Type[]{};
             method = type.GetMethod("get_IsCompleted", flag, null, args, null);
             app.RegisterCLRMethodRedirection(method, get_IsCompleted_0);
@@ -40,7 +40,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object> instance_of_this_method = (global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object>)typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation> instance_of_this_method = (global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation>)typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.IsCompleted;
@@ -57,7 +57,7 @@ namespace ILRuntime.Runtime.Generated
             StackObject* __ret = ILIntepreter.Minus(__esp, 1);
 
             ptr_of_this_method = ILIntepreter.Minus(__esp, 1);
-            global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object> instance_of_this_method = (global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object>)typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.Object>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
+            global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation> instance_of_this_method = (global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation>)typeof(global::IEnumeratorAwaitExtensions.SimpleCoroutineAwaiter<UnityEngine.AsyncOperation>).CheckCLRTypes(StackObject.ToObject(ptr_of_this_method, __domain, __mStack), (CLR.Utils.Extensions.TypeFlags)0);
             __intp.Free(ptr_of_this_method);
 
             var result_of_this_method = instance_of_this_method.GetResult();

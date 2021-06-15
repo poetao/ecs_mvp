@@ -14,7 +14,7 @@ namespace Framework.Core
                 return Type.GetType(path);
             }
 
-            var assemblyName = Path.instance.GetAssemblyPath(assemblyType);
+            var assemblyName = Path.instance.GetAssemblyName(assemblyType);
             var assembly = Assembly.Load(assemblyName);
             if (assembly == null)
             {
@@ -278,7 +278,7 @@ namespace Framework.Core
             var type = GetRuntimeType(path, assembly);
             if (type == null)
             {
-                Log.Reflection.E($"Class do not defined: {path}");
+                Log.Reflection.E("Class do not defined: {0}", path);
                 return default(T);
             }
 
@@ -288,7 +288,11 @@ namespace Framework.Core
         public static T CreateInstance<T>(Type type, params object[] args) where T : class
         {
             var instance = CreateInstance(type, args);
-            if (instance == null) return default(T);
+            if (instance == null)
+            {
+                Log.Reflection.E("CreateInstance Error, type: {0}, args: {1}", type, args);
+                return default(T);
+            }
 
             return instance as T;
         }
@@ -298,7 +302,7 @@ namespace Framework.Core
             var instance = Activator.CreateInstance(type, args);
             if (instance == null)
             {
-                Log.Reflection.E($"{type} is not defined");
+                Log.Reflection.E("{0} is not defined", type);
                 return null;
             }
 

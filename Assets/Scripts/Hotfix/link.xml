@@ -1,4 +1,4 @@
-<assembly fullname="Game">
+<assembly fullname="Hotfix">
     <namespace fullname="Components" preserve="all"/>
     <namespace fullname="Presenters" preserve="all"/>
     <namespace fullname="Views" preserve="all"/>

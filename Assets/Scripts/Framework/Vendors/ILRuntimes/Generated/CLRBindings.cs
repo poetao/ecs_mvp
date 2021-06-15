@@ -85,9 +85,6 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_IEnumerator_Binding.Register(app);
             UnityEngine_Transform_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_String_String_Binding.Register(app);
-            UnityEngine_SceneManagement_SceneManager_Binding.Register(app);
-            IEnumeratorAwaitExtensions_Binding.Register(app);
-            IEnumeratorAwaitExtensions_Binding_SimpleCoroutineAwaiter_1_AsyncOperation_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Int32_Dictionary_2_Type_WeakReference_1_ILTypeInstance_Binding.Register(app);
             System_Collections_Generic_Dictionary_2_Type_WeakReference_1_ILTypeInstance_Binding.Register(app);
             System_WeakReference_1_ILTypeInstance_Binding.Register(app);
@@ -116,6 +113,7 @@ namespace ILRuntime.Runtime.Generated
             System_Collections_Generic_Dictionary_2_String_Int32_Binding.Register(app);
             System_Int32_Binding.Register(app);
             System_Threading_Monitor_Binding.Register(app);
+            UnityEngine_SceneManagement_SceneManager_Binding.Register(app);
             UnityEngine_AsyncOperation_Binding.Register(app);
             UnityEngine_AssetBundleRequest_Binding.Register(app);
             System_Threading_Tasks_Task_1_AssetBundleManifest_Binding.Register(app);
@@ -123,10 +121,12 @@ namespace ILRuntime.Runtime.Generated
             System_TimeSpan_Binding.Register(app);
             System_Threading_Tasks_Task_1_AssetBundle_Binding.Register(app);
             System_Runtime_CompilerServices_TaskAwaiter_1_AssetBundle_Binding.Register(app);
+            IEnumeratorAwaitExtensions_Binding.Register(app);
             IEnumeratorAwaitExtensions_Binding_SimpleCoroutineAwaiter_1_Object_Binding.Register(app);
             UniRx_AsyncSubject_1_Int32_Binding.Register(app);
             UnityEngine_Component_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_CoroutineAdapter_Binding_Adaptor_Binding.Register(app);
+            IEnumeratorAwaitExtensions_Binding_SimpleCoroutineAwaiter_1_AsyncOperation_Binding.Register(app);
             System_Exception_Binding.Register(app);
             System_Runtime_CompilerServices_AsyncTaskMethodBuilder_1_Object_Array_Binding.Register(app);
             UniRx_Subject_1_Unit_Binding.Register(app);
@@ -161,7 +161,8 @@ namespace ILRuntime.Runtime.Generated
             Newtonsoft_Json_JsonConvert_Binding.Register(app);
             System_IObserver_1_String_Binding.Register(app);
             System_NotSupportedException_Binding.Register(app);
-            System_Collections_Generic_Dictionary_2_Int32_String_Binding.Register(app);
+            System_Collections_Generic_Dictionary_2_Int32_Tuple_2_String_String_Binding.Register(app);
+            System_Tuple_2_String_String_Binding.Register(app);
             UnityEngine_Application_Binding.Register(app);
             System_Runtime_InteropServices_OSPlatform_Binding.Register(app);
             System_Runtime_InteropServices_RuntimeInformation_Binding.Register(app);
